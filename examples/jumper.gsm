@@ -1,12 +1,16 @@
 
 ; Tests jump instructions
 
-main:
+; If at any time the value 0 is printed out, something went wrong
 
-jmp end
-.loop:
-jmp main
-jmp .loop
+        set     r1      0
+        set     r2      1
+        jmp     .j1
 
-end:
-halt
+        show    r1
+.j1:
+        show    r2
+        jmp     .j2
+        show    r1
+.j2:
+        halt
