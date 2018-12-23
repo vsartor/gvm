@@ -11,8 +11,8 @@ func main() {
 	args := os.Args[1:]
 
 	if len(args) == 0 {
-		fmt.Fprint(os.Stderr, "Expected at least one argument.\n")
-		fmt.Fprint(os.Stderr, "Call 'gvm h' for usage.\n")
+		fmt.Fprint(os.Stderr, "gvm: Expected at least one argument.\n")
+		fmt.Fprint(os.Stderr, "gvm: Call 'gvm h' for usage.\n")
 		os.Exit(1)
 	}
 
@@ -24,7 +24,7 @@ func main() {
 		logger.SetOutput(os.Stdout)
 	}
 	if debugOffset == 1 && len(args) == 1 {
-		fmt.Fprintln(os.Stderr, "Only received a debug flag.")
+		fmt.Fprintln(os.Stderr, "gvm: Only received a debug flag.")
 		os.Exit(1)
 	}
 
@@ -32,18 +32,27 @@ func main() {
 	switch runMode := args[0+debugOffset]; runMode {
 	case "c":
 		logger.Print("Compilation mode has been set.")
-		logger.Fatal("Compilation mode not yet implemented.")
+		if len(args) != 3+debugOffset {
+			fmt.Fprint(os.Stderr, "gvm: Expected two files after 'c'.\n")
+			os.Exit(1)
+		}
+		compile(args[1+debugOffset], args[2+debugOffset], logger)
+
 	case "r":
 		logger.Print("Execution mode has been set.")
 		logger.Fatal("Execution mode not yet implemented.")
+
 	case "h":
 		fmt.Println("gvm [d|debug] <run mode> [file] [output]")
 		fmt.Println("Run mode options:")
 		fmt.Println("- h: Shows usage.")
 		fmt.Println("- c: Compiles a file.")
 		fmt.Println("- r: Runs a compiled file.")
+
 	default:
-		fmt.Printf("Unknown run mode '%s' was attempted to be set.\n", runMode)
+		fmt.Fprintf(os.Stderr,
+			"gvm: Unknown run mode '%s' was attempted to be set.\n",
+			runMode)
 		os.Exit(1)
 	}
 }
