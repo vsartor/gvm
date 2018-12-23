@@ -28,6 +28,10 @@ Token|Description
 `halt`| Stops program execution
 `set rx val`| Sets register `x` to value `val`
 `add rx ry`| Adds value of register `x` to register `y`
+`sub rx ry`| Subtracts value of register `x` to register `y`
+`mul rx ry`| Multiplies value of register `x` to register `y`
+`div rx ry`| Divides values of register `y` by value of register `x`
+`rem rx ry`| Remainder of division of register `y` by value of register `x`
 `show rx` | Displays the value of the register `x`
 
 ### Details
