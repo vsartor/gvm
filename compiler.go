@@ -177,8 +177,7 @@ func compile(srcPath, dstPath string, l *log.Logger) {
 	src, err := os.Open(srcPath)
 	if err != nil {
 		l.Printf("Error while opening '%s'.\n", srcPath)
-		l.Printf("err: %v\n", err.Error())
-		os.Exit(1)
+		l.Fatalf("err: %v\n", err.Error())
 	}
 	defer src.Close()
 
@@ -190,8 +189,7 @@ func compile(srcPath, dstPath string, l *log.Logger) {
 	dst, err := os.Create(dstPath)
 	if err != nil {
 		l.Printf("Error while opening '%s'.\n", dstPath)
-		l.Printf("err: %v\n", err.Error())
-		os.Exit(1)
+		l.Fatalf("err: %v\n", err.Error())
 	}
 	defer dst.Close()
 

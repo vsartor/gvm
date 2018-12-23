@@ -46,12 +46,21 @@ func main() {
 		}
 		logger.Fatalf("Execution mode has not been implemented.")
 
+	case "d":
+		logger.Println("Disassembly mode has been set.")
+		if len(args) != 2+debugOffset {
+			fmt.Fprint(os.Stderr, "gvm: Expected a file after 'o'.\n")
+			os.Exit(1)
+		}
+		disassemble(args[1+debugOffset], logger)
+
 	case "h":
 		fmt.Println("gvm [d|debug] <run mode> [file] [output]")
 		fmt.Println("Run mode options:")
 		fmt.Println("- h: Shows usage.")
 		fmt.Println("- c: Compiles a file.")
 		fmt.Println("- r: Runs a compiled file.")
+		fmt.Println("- d: Disassemble and pretty print a compiled file.")
 
 	default:
 		fmt.Fprintf(os.Stderr,
