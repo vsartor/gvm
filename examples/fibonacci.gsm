@@ -1,0 +1,31 @@
+
+fibonacci:
+        set     r10     1
+        cmp     r1      r10
+        jge     .simple
+.recursive:
+        dec     r1
+        push    r1
+        call    fibonacci
+        pop     r2
+        pop     r1
+        dec     r1
+        push    r2
+        call    fibonacci
+        pop     r2
+        pop     r3
+        add     r3      r2
+        push    r2
+        jmp     .end
+.simple:
+        set     r2      1
+        push    r2
+.end:
+        ret
+
+main:
+        set     r1      11
+        call    fibonacci
+        pop     r1
+        show    r1
+        halt

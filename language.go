@@ -4,6 +4,11 @@ package main
 const (
 	IThalt = iota
 	ITset
+	ITpush
+	ITpop
+	ITinc
+	ITdec
+	ITmov
 	ITadd
 	ITsub
 	ITmul
@@ -18,6 +23,8 @@ const (
 	ITjge
 	ITjle
 	ITshow
+	ITcall
+	ITret
 )
 
 var (
@@ -31,6 +38,11 @@ func init() {
 
 	it2str[IThalt] = "halt"
 	it2str[ITset] = "set"
+	it2str[ITpush] = "push"
+	it2str[ITpop] = "pop"
+	it2str[ITinc] = "inc"
+	it2str[ITdec] = "dec"
+	it2str[ITmov] = "mov"
 	it2str[ITadd] = "add"
 	it2str[ITsub] = "sub"
 	it2str[ITmul] = "mul"
@@ -45,6 +57,8 @@ func init() {
 	it2str[ITjge] = "jge"
 	it2str[ITjle] = "jle"
 	it2str[ITshow] = "show"
+	it2str[ITcall] = "call"
+	it2str[ITret] = "ret"
 
 	for itok, stok := range it2str {
 		str2it[stok] = itok

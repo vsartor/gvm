@@ -85,9 +85,13 @@ func parse(src *os.File, ctxt context) []int64 {
 			// Check it it's a sublabel
 			if label[0] == '.' {
 				label = lastLabel + label
-				// l.Printf("Read sublabel %s for position %d.", label, pos)
+				if ctxt.verbose {
+					ctxt.l.Printf("Read sublabel %s at %d.", label, pos)
+				}
 			} else {
-				// l.Printf("Read label %s for position %d.", label, pos)
+				if ctxt.verbose {
+					ctxt.l.Printf("Read label %s at %d.", label, pos)
+				}
 				lastLabel = label
 			}
 
@@ -103,7 +107,7 @@ func parse(src *os.File, ctxt context) []int64 {
 
 		// Parse instruction tokens
 		switch inst := tokens[0]; inst {
-		case "halt":
+		case "halt", "ret":
 			expectArgN(inst, 1, len(tokens), ctxt)
 			code = append(code, str2it[inst])
 			pos++
@@ -113,13 +117,13 @@ func parse(src *os.File, ctxt context) []int64 {
 			code = append(code, parseRegister(tokens[1], ctxt))
 			code = append(code, parseInt(tokens[2], ctxt))
 			pos += 3
-		case "add", "sub", "mul", "div", "rem", "cmp":
+		case "mov", "add", "sub", "mul", "div", "rem", "cmp":
 			expectArgN(inst, 3, len(tokens), ctxt)
 			code = append(code, str2it[inst])
 			code = append(code, parseRegister(tokens[1], ctxt))
 			code = append(code, parseRegister(tokens[2], ctxt))
 			pos += 3
-		case "jmp", "jeq", "jne", "jgt", "jlt", "jge", "jle":
+		case "jmp", "jeq", "jne", "jgt", "jlt", "jge", "jle", "call":
 			expectArgN(inst, 2, len(tokens), ctxt)
 			code = append(code, str2it[inst])
 			// Add placeholder for the label and make a pending parse
@@ -131,7 +135,7 @@ func parse(src *os.File, ctxt context) []int64 {
 				pos2label[pos+1] = tokens[1]
 			}
 			pos += 2
-		case "show":
+		case "show", "inc", "dec", "push", "pop":
 			expectArgN(inst, 2, len(tokens), ctxt)
 			code = append(code, str2it[inst])
 			code = append(code, parseRegister(tokens[1], ctxt))

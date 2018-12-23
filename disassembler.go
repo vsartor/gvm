@@ -23,20 +23,22 @@ func disassemble(filePath string, ctxt context) {
 	ptr := 0
 	for ptr < len(code) {
 		switch it := code[ptr]; it {
-		case IThalt:
-			fmt.Printf("%s\n", it2str[it])
+		case IThalt, ITret:
+			fmt.Printf("%04d: %s\n", ptr, it2str[it])
 			ptr++
 		case ITset:
-			fmt.Printf("%s r%d %d\n", it2str[it], code[ptr+1], code[ptr+2])
+			fmt.Printf("%04d: %s r%d %d\n",
+				ptr, it2str[it], code[ptr+1], code[ptr+2])
 			ptr += 3
-		case ITadd, ITsub, ITmul, ITdiv, ITrem, ITcmp:
-			fmt.Printf("%s r%d r%d\n", it2str[it], code[ptr+1], code[ptr+2])
+		case ITmov, ITadd, ITsub, ITmul, ITdiv, ITrem, ITcmp:
+			fmt.Printf("%04d: %s r%d r%d\n",
+				ptr, it2str[it], code[ptr+1], code[ptr+2])
 			ptr += 3
-		case ITjmp, ITjeq, ITjne, ITjgt, ITjlt, ITjge, ITjle:
-			fmt.Printf("%s %d\n", it2str[it], code[ptr+1])
+		case ITjmp, ITjeq, ITjne, ITjgt, ITjlt, ITjge, ITjle, ITcall:
+			fmt.Printf("%04d: %s %d\n", ptr, it2str[it], code[ptr+1])
 			ptr += 2
-		case ITshow:
-			fmt.Printf("%s r%d\n", it2str[it], code[ptr+1])
+		case ITshow, ITinc, ITdec, ITpush, ITpop:
+			fmt.Printf("%04d: %s r%d\n", ptr, it2str[it], code[ptr+1])
 			ptr += 2
 		default:
 			ctxt.l.Fatalf("Unexpected instruction %d.\n", code[ptr])
