@@ -83,6 +83,26 @@ func parse(src *os.File, l *log.Logger) []int64 {
 			code = append(code, ITadd)
 			code = append(code, parseRegister(tokens[1], l))
 			code = append(code, parseRegister(tokens[2], l))
+		case "sub":
+			expectArgN(inst, 3, len(tokens), l)
+			code = append(code, ITsub)
+			code = append(code, parseRegister(tokens[1], l))
+			code = append(code, parseRegister(tokens[2], l))
+		case "mul":
+			expectArgN(inst, 3, len(tokens), l)
+			code = append(code, ITmul)
+			code = append(code, parseRegister(tokens[1], l))
+			code = append(code, parseRegister(tokens[2], l))
+		case "div":
+			expectArgN(inst, 3, len(tokens), l)
+			code = append(code, ITdiv)
+			code = append(code, parseRegister(tokens[1], l))
+			code = append(code, parseRegister(tokens[2], l))
+		case "rem":
+			expectArgN(inst, 3, len(tokens), l)
+			code = append(code, ITrem)
+			code = append(code, parseRegister(tokens[1], l))
+			code = append(code, parseRegister(tokens[2], l))
 		case "show":
 			expectArgN(inst, 2, len(tokens), l)
 			code = append(code, ITshow)

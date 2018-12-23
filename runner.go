@@ -36,6 +36,18 @@ func run(filePath string, l *log.Logger) {
 		case ITadd:
 			reg[code[ptr+2]] += reg[code[ptr+1]]
 			ptr += 3
+		case ITsub:
+			reg[code[ptr+2]] -= reg[code[ptr+1]]
+			ptr += 3
+		case ITmul:
+			reg[code[ptr+2]] *= reg[code[ptr+1]]
+			ptr += 3
+		case ITdiv:
+			reg[code[ptr+2]] /= reg[code[ptr+1]]
+			ptr += 3
+		case ITrem:
+			reg[code[ptr+2]] %= reg[code[ptr+1]]
+			ptr += 3
 		case ITshow:
 			fmt.Printf("%d\n", reg[code[ptr+1]])
 			ptr += 2

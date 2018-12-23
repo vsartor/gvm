@@ -25,13 +25,24 @@ func disassemble(filePath string, l *log.Logger) {
 	for ptr < len(code) {
 		switch code[ptr] {
 		case IThalt:
-			fmt.Println("halt")
 			ptr++
 		case ITset:
 			fmt.Printf("set r%d %d\n", code[ptr+1], code[ptr+2])
 			ptr += 3
 		case ITadd:
-			fmt.Printf("set r%d r%d\n", code[ptr+1], code[ptr+2])
+			fmt.Printf("add r%d r%d\n", code[ptr+1], code[ptr+2])
+			ptr += 3
+		case ITsub:
+			fmt.Printf("sub r%d r%d\n", code[ptr+1], code[ptr+2])
+			ptr += 3
+		case ITmul:
+			fmt.Printf("mul r%d r%d\n", code[ptr+1], code[ptr+2])
+			ptr += 3
+		case ITdiv:
+			fmt.Printf("div r%d r%d\n", code[ptr+1], code[ptr+2])
+			ptr += 3
+		case ITrem:
+			fmt.Printf("rem r%d r%d\n", code[ptr+1], code[ptr+2])
 			ptr += 3
 		case ITshow:
 			fmt.Printf("show r%d\n", code[ptr+1])

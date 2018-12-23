@@ -1,8 +1,37 @@
 
 ; Simple integer arithmetic test
+; Outputs should always be 50
 
-set     r1      12      ; Sets first register to 12
-set     r2      46      ; Sets second register to 46
+; Addition
+set     r1      -14      ; Sets first register to 12
+set     r2      64       ; Sets second register to 46
 add     r1      r2      ; Adds the value of the first register to the second
 show    r2              ; Displays the value of the first register
-halt                    ; Stops execution
+
+; Subtraction
+set     r1      14
+set     r2      64
+sub     r1      r2
+show    r2
+
+; Multiplication
+set     r1      -10
+set     r2      -5
+mul     r1      r2
+show    r2
+
+; Division
+set     r1      5
+set     r2      250
+div     r1      r2
+show    r2
+
+; Remainder
+set     r1      80
+set     r2      130
+rem     r1      r2
+show r2
+
+halt                    ; Stops execution.
+                        ; Unecessary because language specification already
+                        ; adds a halt at the end of the file.
