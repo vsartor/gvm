@@ -9,10 +9,10 @@ const (
 	ITmul
 	ITdiv
 	ITrem
+	ITcmp
 	ITjmp
-	// ITcmp
-	// ITjeq
-	// ITjnq
+	ITjeq
+	ITjne
 	// ITjgt
 	// ITjlt
 	// ITjge
@@ -36,7 +36,10 @@ func init() {
 	it2str[ITmul] = "mul"
 	it2str[ITdiv] = "div"
 	it2str[ITrem] = "rem"
+	it2str[ITcmp] = "cmp"
 	it2str[ITjmp] = "jmp"
+	it2str[ITjeq] = "jeq"
+	it2str[ITjne] = "jne"
 	it2str[ITshow] = "show"
 
 	for itok, stok := range it2str {

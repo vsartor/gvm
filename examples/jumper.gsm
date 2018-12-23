@@ -2,15 +2,38 @@
 ; Tests jump instructions
 
 ; If at any time the value 0 is printed out, something went wrong
+; Show r1 should never be executed
 
         set     r1      0
         set     r2      1
+        jmp     test_jmp
+
+test_jmp:
         jmp     .j1
 
         show    r1
 .j1:
         show    r2
-        jmp     .j2
+        jmp     test_jeq
         show    r1
-.j2:
+
+test_jeq:
+        cmp     r1      r1
+        jeq     .success
+        show    r1
+.success:
+        show    r2
+        jmp     test_jne
+        show    r1
+
+test_jne:
+        cmp     r1      r2
+        jne     .success
+        show    r1
+.success:
+        show    r2
+        jmp     end
+        show    r1
+
+end:
         halt

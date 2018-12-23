@@ -24,6 +24,7 @@ func run(filePath string, l *log.Logger) {
 	l.Println("Starting execution now.")
 
 	reg := make([]int64, regCount)
+	var cmpFlag int64
 
 	ptr := int64(0)
 	for ptr < int64(len(code)) {
@@ -48,8 +49,23 @@ func run(filePath string, l *log.Logger) {
 		case ITrem:
 			reg[code[ptr+2]] %= reg[code[ptr+1]]
 			ptr += 3
+		case ITcmp:
+			cmpFlag = reg[code[ptr+2]] - reg[code[ptr+1]]
+			ptr += 3
 		case ITjmp:
 			ptr = code[ptr+1]
+		case ITjeq:
+			if cmpFlag == 0 {
+				ptr = code[ptr+1]
+			} else {
+				ptr += 2
+			}
+		case ITjne:
+			if cmpFlag != 0 {
+				ptr = code[ptr+1]
+			} else {
+				ptr += 2
+			}
 		case ITshow:
 			fmt.Printf("%d\n", reg[code[ptr+1]])
 			ptr += 2

@@ -30,10 +30,10 @@ func disassemble(filePath string, l *log.Logger) {
 		case ITset:
 			fmt.Printf("%s r%d %d\n", it2str[it], code[ptr+1], code[ptr+2])
 			ptr += 3
-		case ITadd, ITsub, ITmul, ITdiv, ITrem:
+		case ITadd, ITsub, ITmul, ITdiv, ITrem, ITcmp:
 			fmt.Printf("%s r%d r%d\n", it2str[it], code[ptr+1], code[ptr+2])
 			ptr += 3
-		case ITjmp:
+		case ITjmp, ITjeq, ITjne:
 			fmt.Printf("%s %d\n", it2str[it], code[ptr+1])
 			ptr += 2
 		case ITshow:
