@@ -104,47 +104,23 @@ func parse(src *os.File, l *log.Logger) []int64 {
 		switch inst := tokens[0]; inst {
 		case "halt":
 			expectArgN(inst, 1, len(tokens), l)
-			code = append(code, IThalt)
+			code = append(code, str2it[inst])
 			pos++
 		case "set":
 			expectArgN(inst, 3, len(tokens), l)
-			code = append(code, ITset)
+			code = append(code, str2it[inst])
 			code = append(code, parseRegister(tokens[1], l))
 			code = append(code, parseInt(tokens[2], l))
 			pos += 3
-		case "add":
+		case "add", "sub", "mul", "div", "rem":
 			expectArgN(inst, 3, len(tokens), l)
-			code = append(code, ITadd)
-			code = append(code, parseRegister(tokens[1], l))
-			code = append(code, parseRegister(tokens[2], l))
-			pos += 3
-		case "sub":
-			expectArgN(inst, 3, len(tokens), l)
-			code = append(code, ITsub)
-			code = append(code, parseRegister(tokens[1], l))
-			code = append(code, parseRegister(tokens[2], l))
-			pos += 3
-		case "mul":
-			expectArgN(inst, 3, len(tokens), l)
-			code = append(code, ITmul)
-			code = append(code, parseRegister(tokens[1], l))
-			code = append(code, parseRegister(tokens[2], l))
-			pos += 3
-		case "div":
-			expectArgN(inst, 3, len(tokens), l)
-			code = append(code, ITdiv)
-			code = append(code, parseRegister(tokens[1], l))
-			code = append(code, parseRegister(tokens[2], l))
-			pos += 3
-		case "rem":
-			expectArgN(inst, 3, len(tokens), l)
-			code = append(code, ITrem)
+			code = append(code, str2it[inst])
 			code = append(code, parseRegister(tokens[1], l))
 			code = append(code, parseRegister(tokens[2], l))
 			pos += 3
 		case "jmp":
 			expectArgN(inst, 2, len(tokens), l)
-			code = append(code, ITjmp)
+			code = append(code, str2it[inst])
 			// Add placeholder for the label and make a pending parse
 			code = append(code, 0)
 			// Expand if it's a sublabel
@@ -156,7 +132,7 @@ func parse(src *os.File, l *log.Logger) []int64 {
 			pos += 2
 		case "show":
 			expectArgN(inst, 2, len(tokens), l)
-			code = append(code, ITshow)
+			code = append(code, str2it[inst])
 			code = append(code, parseRegister(tokens[1], l))
 			pos += 2
 		default:

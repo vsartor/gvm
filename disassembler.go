@@ -23,33 +23,21 @@ func disassemble(filePath string, l *log.Logger) {
 
 	ptr := 0
 	for ptr < len(code) {
-		switch code[ptr] {
+		switch it := code[ptr]; it {
 		case IThalt:
-			fmt.Printf("halt\n")
+			fmt.Printf("%s\n", it2str[it])
 			ptr++
 		case ITset:
-			fmt.Printf("set r%d %d\n", code[ptr+1], code[ptr+2])
+			fmt.Printf("%s r%d %d\n", it2str[it], code[ptr+1], code[ptr+2])
 			ptr += 3
-		case ITadd:
-			fmt.Printf("add r%d r%d\n", code[ptr+1], code[ptr+2])
-			ptr += 3
-		case ITsub:
-			fmt.Printf("sub r%d r%d\n", code[ptr+1], code[ptr+2])
-			ptr += 3
-		case ITmul:
-			fmt.Printf("mul r%d r%d\n", code[ptr+1], code[ptr+2])
-			ptr += 3
-		case ITdiv:
-			fmt.Printf("div r%d r%d\n", code[ptr+1], code[ptr+2])
-			ptr += 3
-		case ITrem:
-			fmt.Printf("rem r%d r%d\n", code[ptr+1], code[ptr+2])
+		case ITadd, ITsub, ITmul, ITdiv, ITrem:
+			fmt.Printf("%s r%d r%d\n", it2str[it], code[ptr+1], code[ptr+2])
 			ptr += 3
 		case ITjmp:
-			fmt.Printf("jmp %d\n", code[ptr+1])
+			fmt.Printf("%s %d\n", it2str[it], code[ptr+1])
 			ptr += 2
 		case ITshow:
-			fmt.Printf("show r%d\n", code[ptr+1])
+			fmt.Printf("%s r%d\n", it2str[it], code[ptr+1])
 			ptr += 2
 		default:
 			l.Fatalf("Unexpected instruction %d.\n", code[ptr])
