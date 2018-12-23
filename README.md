@@ -33,3 +33,9 @@ Token|Description
 ### Details
 
 * After finishing parsing the program, a `halt` instruction is always added at the end.
+
+### Object Files
+
+Object (compiled) files are binary files with little endian encoding and extension *.gbf.
+
+Object files start with an arbitrary header that will change as incompatible changes are introduced, to help avoid problematic errors with incompatible binary formats. The header is then followed by the number of elements in the code array. Then, a straight-up binary encoding of the code array is present.

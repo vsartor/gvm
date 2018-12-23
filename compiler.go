@@ -2,12 +2,14 @@ package main
 
 import (
 	"bufio"
-	"fmt"
+	"encoding/binary"
 	"log"
 	"os"
 	"strconv"
 	"strings"
 )
+
+const binHeader int64 = 201812231
 
 func expectArgN(tokens string, n, tot int, l *log.Logger) {
 	if n != tot {
@@ -16,13 +18,13 @@ func expectArgN(tokens string, n, tot int, l *log.Logger) {
 	}
 }
 
-func parseRegister(token string, l *log.Logger) int {
+func parseRegister(token string, l *log.Logger) int64 {
 	if token[0] != 'r' && token[0] != 'f' {
 		l.Fatalf("While parsing register expected 'r' or 'f' and got '%c'.",
 			token[0])
 	}
 
-	reg, err := strconv.Atoi(token[1:])
+	reg, err := strconv.ParseInt(token[1:], 10, 64)
 	if err != nil {
 		l.Printf("Failed to parse register.\n")
 		l.Printf("err: %v\n", err.Error())
@@ -32,8 +34,8 @@ func parseRegister(token string, l *log.Logger) int {
 	return reg
 }
 
-func parseInt(token string, l *log.Logger) int {
-	val, err := strconv.Atoi(token)
+func parseInt(token string, l *log.Logger) int64 {
+	val, err := strconv.ParseInt(token, 10, 64)
 	if err != nil {
 		l.Printf("Failed to parse integer.\n")
 		l.Printf("err: %v\n", err.Error())
@@ -43,10 +45,10 @@ func parseInt(token string, l *log.Logger) int {
 	return val
 }
 
-func parse(src *os.File, l *log.Logger) []int {
+func parse(src *os.File, l *log.Logger) []int64 {
 	l.Printf("Parsing file '%s'.\n", src.Name())
 
-	code := make([]int, 0, 64)
+	code := make([]int64, 0, 64)
 
 	scanner := bufio.NewScanner(src)
 	for scanner.Scan() {
@@ -103,7 +105,74 @@ func parse(src *os.File, l *log.Logger) []int {
 	return code
 }
 
+func writeCode(code []int64, dst *os.File, l *log.Logger) {
+	l.Println("Writing binary file.")
+
+	// Header
+	err := binary.Write(dst, binary.LittleEndian, binHeader)
+	if err != nil {
+		l.Println("Failed writting header to file.")
+		l.Fatalf("err: %s\n", err.Error())
+	}
+
+	// Size of the code
+	err = binary.Write(dst, binary.LittleEndian, int64(len(code)))
+	if err != nil {
+		l.Println("Failed writting size of code to file.")
+		l.Fatalf("err: %s\n", err.Error())
+	}
+
+	// Write the code
+	for _, tok := range code {
+		err = binary.Write(dst, binary.LittleEndian, tok)
+		if err != nil {
+			l.Println("Failed writting code token to file.")
+			l.Fatalf("err: %s\n", err.Error())
+		}
+	}
+
+	l.Println("Finished writting binary file.")
+}
+
+func readCode(file *os.File, l *log.Logger) []int64 {
+	l.Println("Reading binary file.")
+
+	// Read and validate header
+	var header int64
+	err := binary.Read(file, binary.LittleEndian, &header)
+	if err != nil {
+		l.Println("Failed reading header from file.")
+		l.Fatalf("err: %s\n", err.Error())
+	}
+	if header != binHeader {
+		l.Fatalf("Expected header %d but got %d.\n", binHeader, header)
+	}
+
+	// Read code size and allocate slice
+	var codeSize int64
+	err = binary.Read(file, binary.LittleEndian, &codeSize)
+	if err != nil {
+		l.Println("Failed reading code size from file.")
+		l.Fatalf("err: %s\n", err.Error())
+	}
+	code := make([]int64, codeSize)
+
+	// Read the code
+	for i := 0; i < int(codeSize); i++ {
+		err = binary.Read(file, binary.LittleEndian, &code[i])
+		if err != nil {
+			l.Println("Failed reading code token from file.")
+			l.Fatalf("err: %s\n", err.Error())
+		}
+	}
+
+	l.Println("Finished reading binary file.")
+
+	return code
+}
+
 func compile(srcPath, dstPath string, l *log.Logger) {
+	// Open source file
 	l.Printf("Trying to open '%s'.\n", srcPath)
 	src, err := os.Open(srcPath)
 	if err != nil {
@@ -113,12 +182,19 @@ func compile(srcPath, dstPath string, l *log.Logger) {
 	}
 	defer src.Close()
 
-	//TODO: In the future, open the file so we can write to it
-	l.Printf("Ignoring destination file '%s' for now.\n", dstPath)
-
 	// Parse the file
 	code := parse(src, l)
-	fmt.Printf("%v\n", code)
+
+	// Create object file
+	l.Printf("Trying to open '%s'.\n", dstPath)
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		l.Printf("Error while opening '%s'.\n", dstPath)
+		l.Printf("err: %v\n", err.Error())
+		os.Exit(1)
+	}
+	defer dst.Close()
 
 	// Write it in binary form into dst
+	writeCode(code, dst, l)
 }

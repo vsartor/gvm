@@ -31,7 +31,7 @@ func main() {
 	// Dispatch into the correct routine
 	switch runMode := args[0+debugOffset]; runMode {
 	case "c":
-		logger.Print("Compilation mode has been set.")
+		logger.Println("Compilation mode has been set.")
 		if len(args) != 3+debugOffset {
 			fmt.Fprint(os.Stderr, "gvm: Expected two files after 'c'.\n")
 			os.Exit(1)
@@ -39,8 +39,12 @@ func main() {
 		compile(args[1+debugOffset], args[2+debugOffset], logger)
 
 	case "r":
-		logger.Print("Execution mode has been set.")
-		logger.Fatal("Execution mode not yet implemented.")
+		logger.Println("Execution mode has been set.")
+		if len(args) != 2+debugOffset {
+			fmt.Fprint(os.Stderr, "gvm: Expected a file after 'r'.\n")
+			os.Exit(1)
+		}
+		logger.Fatalf("Execution mode has not been implemented.")
 
 	case "h":
 		fmt.Println("gvm [d|debug] <run mode> [file] [output]")
