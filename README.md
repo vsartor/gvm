@@ -68,15 +68,22 @@ Comments start with the character `;`. Both the character `;` and everything tha
 
 Token|Description
 -----|-----------
-`halt`| Stops program execution
-`set rx val`| Sets register `x` to value `val`
-`add rx ry`| Adds register `x` to register `y`
-`sub rx ry`| Subtracts register `x` to register `y`
-`mul rx ry`| Multiplies register `x` to register `y`
-`div rx ry`| Divides register `y` by register `x`
-`rem rx ry`| Remainder of division of register `y` by register `x`
-`jmp lab` | Jumps to position at label `lab`
-`show rx` | Displays the register `x`
+`halt`| Stops program execution.
+`set rx val`| Sets register `x` to value `val`.
+`add rx ry`| Adds register `x` to register `y`.
+`sub rx ry`| Subtracts register `x` to register `y`.
+`mul rx ry`| Multiplies register `x` to register `y`.
+`div rx ry`| Divides register `y` by register `x`.
+`rem rx ry`| Remainder of division of register `y` by register `x`.
+`cmp rx ry`| Compares register `y` in relation to `x`.
+`jmp lab` | Jumps to position at label `lab`.
+`jeq lab` | Jumps to position at label `lab` if comparison was equal.
+`jne lab` | Jumps to position at label `lab` if comparison was not equal.
+`jgt lab` | Jumps to position at label `lab` if `ry` was larger than `rx`.
+`jlt lab` | Jumps to position at label `lab` if `ry` was lesser than `rx`.
+`jge lab` | Jumps to position at label `lab` if `ry` was larger or equal than `rx`.
+`jle lab` | Jumps to position at label `lab` if `ry` was lesser or equal than `rx`.
+`show rx` | Displays the register `x`.
 
 ### Details
 
