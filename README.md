@@ -58,6 +58,8 @@ main2.second
     jmp main2.second
 ```
 
+If the label `main` is defined, an instruction is added implicitly to the start of the code sequence that jumps to this label.
+
 ### Comments
 
 Comments start with the character `;`. Both the character `;` and everything that follows it, will be ignored by the compiler.

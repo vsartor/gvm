@@ -2,26 +2,25 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 )
 
 const regCount = 16
 
-func run(filePath string, l *log.Logger) {
-	l.Println("Starting to disassemble.")
+func run(filePath string, ctxt context) {
+	ctxt.l.Println("Starting to disassemble.")
 
-	l.Printf("Opening file '%s' now.\n", filePath)
+	ctxt.l.Printf("Opening file '%s' now.\n", filePath)
 	file, err := os.Open(filePath)
 	if err != nil {
-		l.Printf("Error while opening '%s'.\n", filePath)
-		l.Fatalf("err: %v\n", err.Error())
+		ctxt.l.Printf("Error while opening '%s'.\n", filePath)
+		ctxt.l.Fatalf("err: %v\n", err.Error())
 	}
 	defer file.Close()
 
-	code := readCode(file, l)
+	code := readCode(file, ctxt)
 
-	l.Println("Starting execution now.")
+	ctxt.l.Println("Starting execution now.")
 
 	reg := make([]int64, regCount)
 	var cmpFlag int64
@@ -94,7 +93,7 @@ func run(filePath string, l *log.Logger) {
 			fmt.Printf("%d\n", reg[code[ptr+1]])
 			ptr += 2
 		default:
-			l.Fatalf("Unexpected instruction %d.\n", code[ptr])
+			ctxt.l.Fatalf("Unexpected instruction %d.\n", code[ptr])
 		}
 	}
 }

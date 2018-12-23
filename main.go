@@ -7,6 +7,12 @@ import (
 	"os"
 )
 
+type context struct {
+	l       *log.Logger
+	verbose bool
+	lineNum int
+}
+
 func main() {
 	args := os.Args[1:]
 
@@ -16,12 +22,18 @@ func main() {
 		os.Exit(1)
 	}
 
+	var ctxt context
+
 	// Check early if we're actually doing logging
-	logger := log.New(ioutil.Discard, "", log.Ldate|log.Ltime|log.Lshortfile)
+	ctxt.l = log.New(ioutil.Discard, "", log.Ltime|log.Lshortfile)
 	debugOffset := 0
-	if args[0] == "d" || args[0] == "debug" {
+	if args[0] == "d" {
 		debugOffset++
-		logger.SetOutput(os.Stdout)
+		ctxt.l.SetOutput(os.Stderr)
+	} else if args[0] == "D" {
+		debugOffset++
+		ctxt.l.SetOutput(os.Stdout)
+		ctxt.verbose = true
 	}
 	if debugOffset == 1 && len(args) == 1 {
 		fmt.Fprintln(os.Stderr, "gvm: Only received a debug flag.")
@@ -31,50 +43,50 @@ func main() {
 	// Dispatch into the correct routine
 	switch runMode := args[0+debugOffset]; runMode {
 	case "c":
-		logger.Println("Compilation mode has been set.")
+		ctxt.l.Println("Compilation mode has been set.")
 		if len(args) != 3+debugOffset {
 			fmt.Fprint(os.Stderr, "gvm: Expected two files after 'c'.\n")
 			os.Exit(1)
 		}
-		compile(args[1+debugOffset], args[2+debugOffset], logger)
+		compile(args[1+debugOffset], args[2+debugOffset], ctxt)
 
 	case "r":
-		logger.Println("Execution mode has been set.")
+		ctxt.l.Println("Execution mode has been set.")
 		if len(args) != 2+debugOffset {
 			fmt.Fprint(os.Stderr, "gvm: Expected a file after 'r'.\n")
 			os.Exit(1)
 		}
-		run(args[1+debugOffset], logger)
+		run(args[1+debugOffset], ctxt)
 
 	case "d":
-		logger.Println("Disassembly mode has been set.")
+		ctxt.l.Println("Disassembly mode has been set.")
 		if len(args) != 2+debugOffset {
 			fmt.Fprint(os.Stderr, "gvm: Expected a file after 'o'.\n")
 			os.Exit(1)
 		}
-		disassemble(args[1+debugOffset], logger)
+		disassemble(args[1+debugOffset], ctxt)
 
 	case "cr":
-		logger.Println("Compilation and running mode has been set.")
+		ctxt.l.Println("Compilation and running mode has been set.")
 		if len(args) != 3+debugOffset {
 			fmt.Fprint(os.Stderr, "gvm: Expected two files after 'cr'.\n")
 			os.Exit(1)
 		}
-		logger.Println("Starting compilation mode.")
-		compile(args[1+debugOffset], args[2+debugOffset], logger)
-		logger.Println("Starting running mode.")
-		run(args[2+debugOffset], logger)
+		ctxt.l.Println("Starting compilation mode.")
+		compile(args[1+debugOffset], args[2+debugOffset], ctxt)
+		ctxt.l.Println("Starting running mode.")
+		run(args[2+debugOffset], ctxt)
 
 	case "cd":
-		logger.Println("Compilation and disassembly mode has been set.")
+		ctxt.l.Println("Compilation and disassembly mode has been set.")
 		if len(args) != 3+debugOffset {
 			fmt.Fprint(os.Stderr, "gvm: Expected two files after 'cd'.\n")
 			os.Exit(1)
 		}
-		logger.Println("Starting compilation mode.")
-		compile(args[1+debugOffset], args[2+debugOffset], logger)
-		logger.Println("Starting disassembly mode.")
-		disassemble(args[2+debugOffset], logger)
+		ctxt.l.Println("Starting compilation mode.")
+		compile(args[1+debugOffset], args[2+debugOffset], ctxt)
+		ctxt.l.Println("Starting disassembly mode.")
+		disassemble(args[2+debugOffset], ctxt)
 
 	case "h":
 		fmt.Println("gvm [d|debug] <run mode> [file] [output]")

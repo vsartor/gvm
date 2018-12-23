@@ -2,6 +2,12 @@
 ; Tests jump instructions
 ; Outputs should always be 1
 
+
+; This block until 'main' should never be run
+        set     r1      1
+        show    r1
+
+main:
         set     r1      0       ; Should never be shown
         set     r2      1
         jmp     test_jmp
