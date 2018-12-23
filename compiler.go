@@ -118,7 +118,7 @@ func parse(src *os.File, l *log.Logger) []int64 {
 			code = append(code, parseRegister(tokens[1], l))
 			code = append(code, parseRegister(tokens[2], l))
 			pos += 3
-		case "jmp", "jeq", "jne":
+		case "jmp", "jeq", "jne", "jgt", "jlt", "jge", "jle":
 			expectArgN(inst, 2, len(tokens), l)
 			code = append(code, str2it[inst])
 			// Add placeholder for the label and make a pending parse

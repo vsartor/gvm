@@ -13,10 +13,10 @@ const (
 	ITjmp
 	ITjeq
 	ITjne
-	// ITjgt
-	// ITjlt
-	// ITjge
-	// ITjle
+	ITjgt
+	ITjlt
+	ITjge
+	ITjle
 	ITshow
 )
 
@@ -40,6 +40,10 @@ func init() {
 	it2str[ITjmp] = "jmp"
 	it2str[ITjeq] = "jeq"
 	it2str[ITjne] = "jne"
+	it2str[ITjgt] = "jgt"
+	it2str[ITjlt] = "jlt"
+	it2str[ITjge] = "jge"
+	it2str[ITjle] = "jle"
 	it2str[ITshow] = "show"
 
 	for itok, stok := range it2str {

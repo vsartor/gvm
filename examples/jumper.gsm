@@ -1,18 +1,15 @@
 
 ; Tests jump instructions
+; Outputs should always be 1
 
-; If at any time the value 0 is printed out, something went wrong
-; Show r1 should never be executed
-
-        set     r1      0
+        set     r1      0       ; Should never be shown
         set     r2      1
         jmp     test_jmp
 
 test_jmp:
-        jmp     .j1
-
+        jmp     .success
         show    r1
-.j1:
+.success:
         show    r2
         jmp     test_jeq
         show    r1
@@ -32,8 +29,40 @@ test_jne:
         show    r1
 .success:
         show    r2
-        jmp     end
+        jmp     test_jgt
         show    r1
+
+test_jgt:
+        cmp     r1      r2
+        jgt     .success
+        show    r1
+.success:
+        show    r2
+        jmp     test_jlt
+
+test_jlt:
+        cmp     r2      r1
+        jlt     .success
+        show    r1
+.success:
+        show    r2
+        jmp     test_jge
+
+test_jge:
+        cmp     r1      r1
+        jge     .success
+        show    r1
+.success:
+        show    r2
+        jmp     test_jle
+
+test_jle:
+        cmp     r2      r2
+        jle     .success
+        show    r1
+.success:
+        show    r2
+        jmp     end
 
 end:
         halt

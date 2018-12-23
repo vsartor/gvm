@@ -66,6 +66,30 @@ func run(filePath string, l *log.Logger) {
 			} else {
 				ptr += 2
 			}
+		case ITjgt:
+			if cmpFlag > 0 {
+				ptr = code[ptr+1]
+			} else {
+				ptr += 2
+			}
+		case ITjlt:
+			if cmpFlag < 0 {
+				ptr = code[ptr+1]
+			} else {
+				ptr += 2
+			}
+		case ITjge:
+			if cmpFlag >= 0 {
+				ptr = code[ptr+1]
+			} else {
+				ptr += 2
+			}
+		case ITjle:
+			if cmpFlag <= 0 {
+				ptr = code[ptr+1]
+			} else {
+				ptr += 2
+			}
 		case ITshow:
 			fmt.Printf("%d\n", reg[code[ptr+1]])
 			ptr += 2
