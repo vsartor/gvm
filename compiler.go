@@ -50,6 +50,14 @@ func parse(src *os.File, l *log.Logger) []int64 {
 
 	code := make([]int64, 0, 64)
 
+	label2pos := make(map[string]int64)
+	pos2label := make(map[int64]string)
+
+	label2pos["_zero"] = 0 // Adds the implicitly defined '_zero' label
+	lastLabel := "_zero"
+
+	pos := int64(0)
+
 	scanner := bufio.NewScanner(src)
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -69,49 +77,92 @@ func parse(src *os.File, l *log.Logger) []int64 {
 			continue
 		}
 
+		// Check if it's a label
+		if tok := tokens[0]; tok[len(tok)-1] == ':' {
+			label := tok[:len(tok)-1]
+
+			// Check it it's a sublabel
+			if label[0] == '.' {
+				label = lastLabel + label
+				l.Printf("Read sublabel %s for position %d.", label, pos)
+			} else {
+				l.Printf("Read label %s for position %d.", label, pos)
+				lastLabel = label
+			}
+
+			// Do not allow labels to be rewritten
+			if labPos, ok := label2pos[label]; ok {
+				l.Fatalf("Rewritten label '%s' from %d at %d.",
+					label, labPos, pos)
+			}
+
+			label2pos[label] = pos
+			continue
+		}
+
+		// Parse instruction tokens
 		switch inst := tokens[0]; inst {
 		case "halt":
 			expectArgN(inst, 1, len(tokens), l)
 			code = append(code, IThalt)
+			pos++
 		case "set":
 			expectArgN(inst, 3, len(tokens), l)
 			code = append(code, ITset)
 			code = append(code, parseRegister(tokens[1], l))
 			code = append(code, parseInt(tokens[2], l))
+			pos += 3
 		case "add":
 			expectArgN(inst, 3, len(tokens), l)
 			code = append(code, ITadd)
 			code = append(code, parseRegister(tokens[1], l))
 			code = append(code, parseRegister(tokens[2], l))
+			pos += 3
 		case "sub":
 			expectArgN(inst, 3, len(tokens), l)
 			code = append(code, ITsub)
 			code = append(code, parseRegister(tokens[1], l))
 			code = append(code, parseRegister(tokens[2], l))
+			pos += 3
 		case "mul":
 			expectArgN(inst, 3, len(tokens), l)
 			code = append(code, ITmul)
 			code = append(code, parseRegister(tokens[1], l))
 			code = append(code, parseRegister(tokens[2], l))
+			pos += 3
 		case "div":
 			expectArgN(inst, 3, len(tokens), l)
 			code = append(code, ITdiv)
 			code = append(code, parseRegister(tokens[1], l))
 			code = append(code, parseRegister(tokens[2], l))
+			pos += 3
 		case "rem":
 			expectArgN(inst, 3, len(tokens), l)
 			code = append(code, ITrem)
 			code = append(code, parseRegister(tokens[1], l))
 			code = append(code, parseRegister(tokens[2], l))
+			pos += 3
+		case "jmp":
+			expectArgN(inst, 2, len(tokens), l)
+			code = append(code, ITjmp)
+			// Add placeholder for the label and make a pending parse
+			code = append(code, 0)
+			// Expand if it's a sublabel
+			if tokens[1][0] == '.' {
+				pos2label[pos+1] = lastLabel + tokens[1]
+			} else {
+				pos2label[pos+1] = tokens[1]
+			}
+			pos += 2
 		case "show":
 			expectArgN(inst, 2, len(tokens), l)
 			code = append(code, ITshow)
 			code = append(code, parseRegister(tokens[1], l))
+			pos += 2
 		default:
 			l.Fatalf("Unknown instruction '%s'.", inst)
 		}
 	}
-	l.Println("Finished parsing.")
 
 	if err := scanner.Err(); err != nil {
 		l.Printf("Error while reading the file.\n")
@@ -121,6 +172,21 @@ func parse(src *os.File, l *log.Logger) []int64 {
 
 	// Always append a halt into the end of the code
 	code = append(code, IThalt)
+
+	l.Println("Setting labels to values.")
+
+	// Set labels to their values
+	for codePos, label := range pos2label {
+		jmpPos, ok := label2pos[label]
+		if !ok {
+			l.Fatalf("At position %d invalid reference to unknown label '%s'.",
+				codePos, label)
+		}
+		l.Printf("Setting address at %d for label %s.", codePos, label)
+		code[codePos] = jmpPos
+	}
+
+	l.Println("Finished parsing.")
 
 	return code
 }

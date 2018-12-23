@@ -1,0 +1,12 @@
+
+; Tests jump instructions
+
+main:
+
+jmp end
+.loop:
+jmp main
+jmp .loop
+
+end:
+halt

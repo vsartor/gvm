@@ -44,6 +44,9 @@ func disassemble(filePath string, l *log.Logger) {
 		case ITrem:
 			fmt.Printf("rem r%d r%d\n", code[ptr+1], code[ptr+2])
 			ptr += 3
+		case ITjmp:
+			fmt.Printf("jmp %d\n", code[ptr+1])
+			ptr += 2
 		case ITshow:
 			fmt.Printf("show r%d\n", code[ptr+1])
 			ptr += 2

@@ -17,6 +17,47 @@ In general, there will be examples located in the very well named `examples` fol
 
 Registers are referred to as `rx` where `x` indicates the number of the register. For example `r1` refers to the first register and `r16` refers to the sixteenth register. The same convention is used for floating point registers, however the letter `f` is used instead of `r`.
 
+### Labels
+
+Labels are tokens ending with `:`, and the name of the label is everything before the `:`. Labels are used for jumping instructions, so in the gsm file you jump to labels instead of literal code positions.
+
+One can also use sublabels. The basic idea is that after any given label `lab` is defined, any labels starting with a `.` will be a sublabel, being renamed internally to be a concatenation between `lab` and the sublabel. For example, in the code
+```
+main:
+    set r1 2
+.second
+    set r2 5
+    jmp .second
+```
+the label `.second` is renamed to `main.second`.
+
+Note however, that references to sublabels such as `.second` will also expand as a sublabel of the current scope. For example, the code
+```
+main1:
+    set r1 2
+.second
+    set r2 5
+    jmp .second
+main2:
+    set r1 2
+.second
+    set r2 5
+    jmp .second
+```
+is equivalent to
+```
+main1:
+    set r1 2
+main1.second
+    set r2 5
+    jmp main1.second
+main2:
+    set r1 2
+main2.second
+    set r2 5
+    jmp main2.second
+```
+
 ### Comments
 
 Comments start with the character `;`. Both the character `;` and everything that follows it, will be ignored by the compiler.
@@ -32,10 +73,12 @@ Token|Description
 `mul rx ry`| Multiplies register `x` to register `y`
 `div rx ry`| Divides register `y` by register `x`
 `rem rx ry`| Remainder of division of register `y` by register `x`
+`jmp lab` | Jumps to position at label `lab`
 `show rx` | Displays the register `x`
 
 ### Details
 
+* At the very beginning of the program, a label named `_zero` is implicitly defined.
 * After finishing parsing the program, a `halt` instruction is always added at the end.
 
 ### Object Files

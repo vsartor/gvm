@@ -9,5 +9,13 @@ const (
 	ITmul
 	ITdiv
 	ITrem
+	ITjmp
+	// ITcmp
+	// ITjeq
+	// ITjnq
+	// ITjgt
+	// ITjlt
+	// ITjge
+	// ITjle
 	ITshow
 )

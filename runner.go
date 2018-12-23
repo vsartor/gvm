@@ -25,11 +25,11 @@ func run(filePath string, l *log.Logger) {
 
 	reg := make([]int64, regCount)
 
-	ptr := 0
-	for ptr < len(code) {
+	ptr := int64(0)
+	for ptr < int64(len(code)) {
 		switch code[ptr] {
 		case IThalt:
-			ptr = len(code)
+			ptr = int64(len(code))
 		case ITset:
 			reg[code[ptr+1]] = code[ptr+2]
 			ptr += 3
@@ -48,6 +48,8 @@ func run(filePath string, l *log.Logger) {
 		case ITrem:
 			reg[code[ptr+2]] %= reg[code[ptr+1]]
 			ptr += 3
+		case ITjmp:
+			ptr = code[ptr+1]
 		case ITshow:
 			fmt.Printf("%d\n", reg[code[ptr+1]])
 			ptr += 2
