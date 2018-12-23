@@ -44,7 +44,7 @@ func main() {
 			fmt.Fprint(os.Stderr, "gvm: Expected a file after 'r'.\n")
 			os.Exit(1)
 		}
-		logger.Fatalf("Execution mode has not been implemented.")
+		run(args[1+debugOffset], logger)
 
 	case "d":
 		logger.Println("Disassembly mode has been set.")

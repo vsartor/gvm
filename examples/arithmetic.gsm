@@ -4,5 +4,5 @@
 set     r1      12      ; Sets first register to 12
 set     r2      46      ; Sets second register to 46
 add     r1      r2      ; Adds the value of the first register to the second
-show    r1              ; Displays the value of the first register
+show    r2              ; Displays the value of the first register
 halt                    ; Stops execution
