@@ -25,6 +25,7 @@ func disassemble(filePath string, l *log.Logger) {
 	for ptr < len(code) {
 		switch code[ptr] {
 		case IThalt:
+			fmt.Printf("halt\n")
 			ptr++
 		case ITset:
 			fmt.Printf("set r%d %d\n", code[ptr+1], code[ptr+2])

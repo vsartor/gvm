@@ -65,6 +65,17 @@ func main() {
 		logger.Println("Starting running mode.")
 		run(args[2+debugOffset], logger)
 
+	case "cd":
+		logger.Println("Compilation and disassembly mode has been set.")
+		if len(args) != 3+debugOffset {
+			fmt.Fprint(os.Stderr, "gvm: Expected two files after 'cd'.\n")
+			os.Exit(1)
+		}
+		logger.Println("Starting compilation mode.")
+		compile(args[1+debugOffset], args[2+debugOffset], logger)
+		logger.Println("Starting disassembly mode.")
+		disassemble(args[2+debugOffset], logger)
+
 	case "h":
 		fmt.Println("gvm [d|debug] <run mode> [file] [output]")
 		fmt.Println("Run mode options:")
