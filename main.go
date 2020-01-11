@@ -2,105 +2,99 @@ package main
 
 import (
 	"fmt"
+	"github.com/vsartor/gvm/gvmlib"
 	"io/ioutil"
 	"log"
 	"os"
 )
 
-type context struct {
-	l       *log.Logger
-	verbose bool
-	lineNum int
+var appLogger *log.Logger
+
+func init() {
+	appLogger = log.New(os.Stderr, "gvm: ", 0)
 }
 
 func main() {
 	args := os.Args[1:]
 
 	if len(args) == 0 {
-		fmt.Fprint(os.Stderr, "gvm: Expected at least one argument.\n")
-		fmt.Fprint(os.Stderr, "gvm: Call 'gvm h' for usage.\n")
-		os.Exit(1)
+		appLogger.Fatalln("Expected at least one argument. Call 'gvm help' for usage.")
 	}
 
-	var ctxt context
+	var ctxt gvmlib.Context
 
 	// Check early if we're actually doing logging
-	ctxt.l = log.New(ioutil.Discard, "", log.Ltime|log.Lshortfile)
+	ctxt.Logger = log.New(ioutil.Discard, "", log.Ltime|log.Lshortfile)
 	debugOffset := 0
-	if args[0] == "d" {
+	if args[0] == "l" {
 		debugOffset++
-		ctxt.l.SetOutput(os.Stderr)
-	} else if args[0] == "D" {
+		ctxt.Logger.SetOutput(os.Stderr)
+	} else if args[0] == "L" {
 		debugOffset++
-		ctxt.l.SetOutput(os.Stdout)
-		ctxt.verbose = true
+		ctxt.Logger.SetOutput(os.Stdout)
+		ctxt.IsVerbose = true
 	}
 	if debugOffset == 1 && len(args) == 1 {
-		fmt.Fprintln(os.Stderr, "gvm: Only received a debug flag.")
-		os.Exit(1)
+		appLogger.Fatalln("Only received a debug flag.")
 	}
 
 	// Dispatch into the correct routine
 	switch runMode := args[0+debugOffset]; runMode {
-	case "c":
-		ctxt.l.Println("Compilation mode has been set.")
+	case "c", "compile":
+		ctxt.Logger.Println("Compilation mode has been set.")
 		if len(args) != 3+debugOffset {
-			fmt.Fprint(os.Stderr, "gvm: Expected two files after 'c'.\n")
-			os.Exit(1)
+			appLogger.Fatalln("Expected two files after 'compile': <source_path>, <object_path>")
 		}
-		compile(args[1+debugOffset], args[2+debugOffset], ctxt)
+		gvmlib.Compile(args[1+debugOffset], args[2+debugOffset], ctxt)
 
-	case "r":
-		ctxt.l.Println("Execution mode has been set.")
+	case "r", "run":
+		ctxt.Logger.Println("Execution mode has been set.")
 		if len(args) != 2+debugOffset {
-			fmt.Fprint(os.Stderr, "gvm: Expected a file after 'r'.\n")
-			os.Exit(1)
+			appLogger.Fatalln("Expected one file after 'run': <object_path>")
 		}
-		run(args[1+debugOffset], ctxt)
+		gvmlib.Run(args[1+debugOffset], ctxt)
 
-	case "d":
-		ctxt.l.Println("Disassembly mode has been set.")
+	case "d", "disassemble":
+		ctxt.Logger.Println("Disassembly mode has been set.")
 		if len(args) != 2+debugOffset {
-			fmt.Fprint(os.Stderr, "gvm: Expected a file after 'o'.\n")
-			os.Exit(1)
+			appLogger.Fatalln("Expected one file after 'disassemble': <object_path>")
 		}
-		disassemble(args[1+debugOffset], ctxt)
+		gvmlib.Disassemble(args[1+debugOffset], ctxt)
 
 	case "cr":
-		ctxt.l.Println("Compilation and running mode has been set.")
+		ctxt.Logger.Println("Compilation and running mode has been set.")
 		if len(args) != 3+debugOffset {
-			fmt.Fprint(os.Stderr, "gvm: Expected two files after 'cr'.\n")
-			os.Exit(1)
+			appLogger.Fatalln("Expected two files after 'cr': <source_path>, <object_path>")
 		}
-		ctxt.l.Println("Starting compilation mode.")
-		compile(args[1+debugOffset], args[2+debugOffset], ctxt)
-		ctxt.l.Println("Starting running mode.")
-		run(args[2+debugOffset], ctxt)
+		ctxt.Logger.Println("Starting compilation mode.")
+		gvmlib.Compile(args[1+debugOffset], args[2+debugOffset], ctxt)
+		ctxt.Logger.Println("Starting running mode.")
+		gvmlib.Run(args[2+debugOffset], ctxt)
 
 	case "cd":
-		ctxt.l.Println("Compilation and disassembly mode has been set.")
+		ctxt.Logger.Println("Compilation and disassembly mode has been set.")
 		if len(args) != 3+debugOffset {
-			fmt.Fprint(os.Stderr, "gvm: Expected two files after 'cd'.\n")
-			os.Exit(1)
+			appLogger.Fatalln("Expected two files after 'cd': <source_path>, <object_path>")
 		}
-		ctxt.l.Println("Starting compilation mode.")
-		compile(args[1+debugOffset], args[2+debugOffset], ctxt)
-		ctxt.l.Println("Starting disassembly mode.")
-		disassemble(args[2+debugOffset], ctxt)
+		ctxt.Logger.Println("Starting compilation mode.")
+		gvmlib.Compile(args[1+debugOffset], args[2+debugOffset], ctxt)
+		ctxt.Logger.Println("Starting disassembly mode.")
+		gvmlib.Disassemble(args[2+debugOffset], ctxt)
 
-	case "h":
-		fmt.Println("gvm [d|debug] <run mode> [file] [output]")
-		fmt.Println("Run mode options:")
-		fmt.Println("- h:  Shows usage.")
-		fmt.Println("- c:  Compiles a file.")
-		fmt.Println("- r:  Runs a compiled file.")
-		fmt.Println("- d:  Disassemble and pretty print a compiled file.")
-		fmt.Println("- cr: Compiles a file and then runs it.")
+	case "h", "help":
+		fmt.Println("gvm [logging flag] <command> [input file] [output file]")
+		fmt.Println("Available commands:")
+		fmt.Println("  help (h)           Shows this message.")
+		fmt.Println("  compile (c)        Compiles a file.")
+		fmt.Println("  run (r)            Runs a compiled file.")
+		fmt.Println("  disassemble (d)    Disassembles and pretty prints a compiled file.")
+		fmt.Println("  cd                 Compiles, disassembles and pretty prints a compiled file.")
+		fmt.Println("  cr                 Compiles a file and then runs it.")
+		fmt.Println("Available logging flags:")
+		fmt.Println("  l                  Basic logging.")
+		fmt.Println("  L                  Verbose logging.")
 
 	default:
-		fmt.Fprintf(os.Stderr,
-			"gvm: Unknown run mode '%s' was attempted to be set.\n",
-			runMode)
-		os.Exit(1)
+		appLogger.Fatalf("Unknown command '%s'.\n", runMode)
 	}
 }

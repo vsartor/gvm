@@ -1,24 +1,24 @@
-package main
+package gvmlib
 
 import (
 	"fmt"
 	"os"
 )
 
-func disassemble(filePath string, ctxt context) {
-	ctxt.l.Println("Starting to disassemble.")
+func Disassemble(filePath string, ctxt Context) {
+	ctxt.Logger.Println("Starting to disassemble.")
 
-	ctxt.l.Printf("Opening file '%s' now.\n", filePath)
+	ctxt.Logger.Printf("Opening file '%s' now.\n", filePath)
 	file, err := os.Open(filePath)
 	if err != nil {
-		ctxt.l.Printf("Error while opening '%s'.\n", filePath)
-		ctxt.l.Fatalf("err: %v\n", err.Error())
+		ctxt.Logger.Printf("Error while opening '%s'.\n", filePath)
+		ctxt.Logger.Fatalf("err: %v\n", err.Error())
 	}
 	defer file.Close()
 
 	code := readCode(file, ctxt)
 
-	ctxt.l.Println("Pretty printing now.")
+	ctxt.Logger.Println("Pretty printing now.")
 
 	ptr := 0
 	for ptr < len(code) {
@@ -41,7 +41,7 @@ func disassemble(filePath string, ctxt context) {
 			fmt.Printf("%04d: %s r%d\n", ptr, it2str[it], code[ptr+1])
 			ptr += 2
 		default:
-			ctxt.l.Fatalf("Unexpected instruction %d.\n", code[ptr])
+			ctxt.Logger.Fatalf("Unexpected instruction %d.\n", code[ptr])
 		}
 	}
 }

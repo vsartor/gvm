@@ -1,4 +1,4 @@
-package main
+package gvmlib
 
 // Instruction tokens
 const (

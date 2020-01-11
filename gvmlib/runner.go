@@ -1,4 +1,4 @@
-package main
+package gvmlib
 
 import (
 	"fmt"
@@ -11,20 +11,20 @@ const (
 	callStackSize = 64
 )
 
-func run(filePath string, ctxt context) {
-	ctxt.l.Println("Starting to disassemble.")
+func Run(filePath string, ctxt Context) {
+	ctxt.Logger.Println("Starting to disassemble.")
 
-	ctxt.l.Printf("Opening file '%s' now.\n", filePath)
+	ctxt.Logger.Printf("Opening file '%s' now.\n", filePath)
 	file, err := os.Open(filePath)
 	if err != nil {
-		ctxt.l.Printf("Error while opening '%s'.\n", filePath)
-		ctxt.l.Fatalf("err: %v\n", err.Error())
+		ctxt.Logger.Printf("Error while opening '%s'.\n", filePath)
+		ctxt.Logger.Fatalf("err: %v\n", err.Error())
 	}
 	defer file.Close()
 
 	code := readCode(file, ctxt)
 
-	ctxt.l.Println("Starting execution now.")
+	ctxt.Logger.Println("Starting execution now.")
 
 	stack := make([]int64, stackSize)
 	stackPtr := 0
@@ -125,7 +125,7 @@ func run(filePath string, ctxt context) {
 			callStackPtr--
 			ptr = callStack[callStackPtr]
 		default:
-			ctxt.l.Fatalf("Unexpected instruction %d.\n", code[ptr])
+			ctxt.Logger.Fatalf("Unexpected instruction %d.\n", code[ptr])
 		}
 	}
 }
