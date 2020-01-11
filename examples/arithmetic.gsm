@@ -5,8 +5,8 @@
 ; Addition
 set     r1      -14      ; Sets first register to 12
 set     r2      64       ; Sets second register to 46
-add     r1      r2      ; Adds the value of the first register to the second
-show    r2              ; Displays the value of the first register
+add     r1      r2       ; Adds the value of the first register to the second
+show    r2               ; Displays the value of the first register
 
 ; Subtraction
 set     r1      14
@@ -30,8 +30,7 @@ show    r2
 set     r1      80
 set     r2      130
 rem     r1      r2
-show r2
+show    r2
 
-halt                    ; Stops execution.
-                        ; Unecessary because language specification already
-                        ; adds a halt at the end of the file.
+; A `halt` instruction here is unnecessary because language specification
+; already guarantees a `halt` instruction at the end of the program.

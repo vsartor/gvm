@@ -1,17 +1,22 @@
 
 fibonacci:
+        ; First, we check the input (r1) against the value 1 (r10)
         set     r10     1
         cmp     r1      r10
+        ; If greater or equal to one, jump to a routine that returns the value 1
         jge     .simple
 .recursive:
+        ; Compute fibonacci(@input - 1)
         dec     r1
         push    r1
         call    fibonacci
+        ; Compute fibonacci(@input - 2)
         pop     r2
         pop     r1
         dec     r1
         push    r2
         call    fibonacci
+        ; Compute the last two computed values and return
         pop     r2
         pop     r3
         add     r3      r2
@@ -24,6 +29,7 @@ fibonacci:
         ret
 
 main:
+        ; Call and print fibonacci(11)
         set     r1      11
         call    fibonacci
         pop     r1
