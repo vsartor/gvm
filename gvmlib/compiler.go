@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const binHeader int64 = 201812241
+const binHeader int64 = 20200111
 
 func expectArgN(tokens string, n, tot int, ctxt Context) {
 	if n != tot {
@@ -18,8 +18,8 @@ func expectArgN(tokens string, n, tot int, ctxt Context) {
 }
 
 func parseRegister(token string, ctxt Context) int64 {
-	if token[0] != 'r' && token[0] != 'f' {
-		ctxt.Logger.Fatalf("l%d: Parsing register: expected 'r|f', got '%c'.",
+	if token[0] != 'r' {
+		ctxt.Logger.Fatalf("l%d: Parsing register: expected 'r', got '%c'.",
 			ctxt.LineNum, token[0])
 	}
 
