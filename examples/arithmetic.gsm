@@ -32,5 +32,4 @@ set     r2      130
 rem     r1      r2
 show    r2
 
-; A `halt` instruction here is unnecessary because language specification
-; already guarantees a `halt` instruction at the end of the program.
+halt

@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/vsartor/gvm/gvmlib"
-	"io/ioutil"
+	"github.com/vsartor/gvm/gvm"
+	"github.com/vsartor/gvm/gvm/compiler"
+	"github.com/vsartor/gvm/gvm/vm"
 	"log"
 	"os"
 )
@@ -21,19 +22,20 @@ func main() {
 		appLogger.Fatalln("Expected at least one argument. Call 'gvm help' for usage.")
 	}
 
-	var ctxt gvmlib.Context
+	var ctxt gvm.Context
 
 	// Check early if we're actually doing logging
-	ctxt.Logger = log.New(ioutil.Discard, "", log.Ltime|log.Lshortfile)
 	debugOffset := 0
 	if args[0] == "l" {
 		debugOffset++
-		ctxt.Logger.SetOutput(os.Stderr)
+		gvm.Logger.SetOutput(os.Stderr)
 	} else if args[0] == "L" {
 		debugOffset++
-		ctxt.Logger.SetOutput(os.Stdout)
+		gvm.Logger.SetOutput(os.Stdout)
 		ctxt.IsVerbose = true
 	}
+
+	// Error out in case only a debug flag was passed
 	if debugOffset == 1 && len(args) == 1 {
 		appLogger.Fatalln("Only received a debug flag.")
 	}
@@ -41,45 +43,45 @@ func main() {
 	// Dispatch into the correct routine
 	switch runMode := args[0+debugOffset]; runMode {
 	case "c", "compile":
-		ctxt.Logger.Println("Compilation mode has been set.")
+		gvm.Logger.Println("Compilation mode has been set.")
 		if len(args) != 3+debugOffset {
 			appLogger.Fatalln("Expected two files after 'compile': <source_path>, <object_path>")
 		}
-		gvmlib.Compile(args[1+debugOffset], args[2+debugOffset], ctxt)
+		compiler.Compile(args[1+debugOffset], args[2+debugOffset], ctxt)
 
 	case "r", "run":
-		ctxt.Logger.Println("Execution mode has been set.")
+		gvm.Logger.Println("Execution mode has been set.")
 		if len(args) != 2+debugOffset {
 			appLogger.Fatalln("Expected one file after 'run': <object_path>")
 		}
-		gvmlib.Run(args[1+debugOffset], ctxt)
+		vm.Run(args[1+debugOffset], ctxt)
 
 	case "d", "disassemble":
-		ctxt.Logger.Println("Disassembly mode has been set.")
+		gvm.Logger.Println("Disassembly mode has been set.")
 		if len(args) != 2+debugOffset {
 			appLogger.Fatalln("Expected one file after 'disassemble': <object_path>")
 		}
-		gvmlib.Disassemble(args[1+debugOffset], ctxt)
+		vm.Disassemble(args[1+debugOffset], ctxt)
 
 	case "cr":
-		ctxt.Logger.Println("Compilation and running mode has been set.")
+		gvm.Logger.Println("Compilation and running mode has been set.")
 		if len(args) != 3+debugOffset {
 			appLogger.Fatalln("Expected two files after 'cr': <source_path>, <object_path>")
 		}
-		ctxt.Logger.Println("Starting compilation mode.")
-		gvmlib.Compile(args[1+debugOffset], args[2+debugOffset], ctxt)
-		ctxt.Logger.Println("Starting running mode.")
-		gvmlib.Run(args[2+debugOffset], ctxt)
+		gvm.Logger.Println("Starting compilation mode.")
+		compiler.Compile(args[1+debugOffset], args[2+debugOffset], ctxt)
+		gvm.Logger.Println("Starting running mode.")
+		vm.Run(args[2+debugOffset], ctxt)
 
 	case "cd":
-		ctxt.Logger.Println("Compilation and disassembly mode has been set.")
+		gvm.Logger.Println("Compilation and disassembly mode has been set.")
 		if len(args) != 3+debugOffset {
 			appLogger.Fatalln("Expected two files after 'cd': <source_path>, <object_path>")
 		}
-		ctxt.Logger.Println("Starting compilation mode.")
-		gvmlib.Compile(args[1+debugOffset], args[2+debugOffset], ctxt)
-		ctxt.Logger.Println("Starting disassembly mode.")
-		gvmlib.Disassemble(args[2+debugOffset], ctxt)
+		gvm.Logger.Println("Starting compilation mode.")
+		compiler.Compile(args[1+debugOffset], args[2+debugOffset], ctxt)
+		gvm.Logger.Println("Starting disassembly mode.")
+		vm.Disassemble(args[2+debugOffset], ctxt)
 
 	case "h", "help":
 		fmt.Println("gvm [logging flag] <command> [input file] [output file]")
