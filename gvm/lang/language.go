@@ -9,7 +9,7 @@ import (
 // Instructions
 const (
 	Halt gvm.Code = iota
-	Set
+	Const
 	Push
 	Pop
 	Inc
@@ -46,7 +46,7 @@ func init() {
 	instructionFromRepr = make(map[string]gvm.Code)
 
 	reprFromIns[Halt] = "halt"
-	reprFromIns[Set] = "set"
+	reprFromIns[Const] = "const"
 	reprFromIns[Push] = "push"
 	reprFromIns[Pop] = "pop"
 	reprFromIns[Inc] = "inc"

@@ -4,12 +4,12 @@
 
 
 ; This block until 'main' should never be run
-        set     r1      1
+        const   1       r1
         show    r1
 
 main:
-        set     r1      0       ; Should never be shown
-        set     r2      1
+        const   0       r1      ; Should never be shown
+        const   1       r2
         jmp     test_jmp
 
 test_jmp:

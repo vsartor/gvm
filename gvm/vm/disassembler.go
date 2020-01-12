@@ -15,8 +15,8 @@ func disassemble(code []gvm.Code, ctxt gvm.Context) {
 		case lang.Halt, lang.Ret:
 			fmt.Printf("%04d: %s\n", codePosition, lang.ToString(instruction))
 			codePosition++
-		case lang.Set:
-			fmt.Printf("%04d: %s r%d %d\n",
+		case lang.Const:
+			fmt.Printf("%04d: %s %d r%d\n",
 				codePosition, lang.ToString(instruction), code[codePosition+1], code[codePosition+2])
 			codePosition += 3
 		case lang.Mov, lang.Add, lang.Sub, lang.Mul, lang.Div, lang.Rem, lang.Cmp:

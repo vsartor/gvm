@@ -3,32 +3,32 @@
 ; Outputs should always be 50
 
 ; Addition
-set     r1      -14      ; Sets first register to 12
-set     r2      64       ; Sets second register to 46
-add     r1      r2       ; Adds the value of the first register to the second
-show    r2               ; Displays the value of the first register
+const   -14     r1
+const   64      r2
+add     r1      r2
+show    r2
 
 ; Subtraction
-set     r1      14
-set     r2      64
+const   14      r1
+const   64      r2
 sub     r1      r2
 show    r2
 
 ; Multiplication
-set     r1      -10
-set     r2      -5
+const   -10     r1
+const   -5      r2
 mul     r1      r2
 show    r2
 
 ; Division
-set     r1      5
-set     r2      250
+const   5       r1
+const   250     r2
 div     r1      r2
 show    r2
 
 ; Remainder
-set     r1      80
-set     r2      130
+const   80      r1
+const   130     r2
 rem     r1      r2
 show    r2
 

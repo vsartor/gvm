@@ -35,9 +35,9 @@ func Run(filePath string, ctxt gvm.Context) {
 		case lang.Halt:
 			// Program needs to stop. Do so by making the loop condition false.
 			codePosition = int64(len(code))
-		case lang.Set:
-			dstRegIdx := code[codePosition+1]
-			intConst := int64(code[codePosition+2])
+		case lang.Const:
+			dstRegIdx := code[codePosition+2]
+			intConst := int64(code[codePosition+1])
 			reg[dstRegIdx] = intConst
 			codePosition += 3
 		case lang.Push:

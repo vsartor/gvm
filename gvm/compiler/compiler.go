@@ -103,11 +103,11 @@ func compile(src *os.File, ctxt gvm.Context) []gvm.Code {
 			assertArgCount(instruction, 1, len(tokens), ctxt)
 			code = append(code, instruction)
 			currCodePosition++
-		case lang.Set:
+		case lang.Const:
 			assertArgCount(instruction, 3, len(tokens), ctxt)
 			code = append(code, instruction)
-			code = append(code, parseRegister(tokens[1], ctxt))
-			code = append(code, parseInt(tokens[2], ctxt))
+			code = append(code, parseInt(tokens[1], ctxt))
+			code = append(code, parseRegister(tokens[2], ctxt))
 			currCodePosition += 3
 		case lang.Mov, lang.Add, lang.Sub, lang.Mul, lang.Div, lang.Rem, lang.Cmp:
 			assertArgCount(instruction, 3, len(tokens), ctxt)
