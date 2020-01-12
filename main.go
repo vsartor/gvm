@@ -67,7 +67,7 @@ func main() {
 			appLogger.Criticalf("Expected one file after 'run': <object_path>\n")
 			os.Exit(1)
 		}
-		vm.Run(args[1], args[2:])
+		vm.Execute(args[1], args[2:])
 
 	case "d", "disassemble":
 		if len(args) != 2 {
@@ -75,6 +75,13 @@ func main() {
 			os.Exit(1)
 		}
 		vm.Disassemble(args[1])
+
+	case "D", "debug":
+		if len(args) < 2 {
+			appLogger.Criticalf("Expected one file after 'run': <object_path>\n")
+			os.Exit(1)
+		}
+		vm.Execute(args[1], args[2:])
 
 	case "cr":
 		// For composite commands, if output directory is not given write to tmpdir
@@ -87,7 +94,7 @@ func main() {
 			os.Exit(1)
 		}
 		compiler.Compile(args[1], args[2])
-		vm.Run(args[2], args[3:])
+		vm.Execute(args[2], args[3:])
 
 	case "cd":
 		// For composite commands, if output directory is not given write to tmpdir
