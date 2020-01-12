@@ -6,7 +6,6 @@ import (
 	"github.com/vsartor/gvm/gvm/compiler"
 	"github.com/vsartor/gvm/gvm/lang"
 	"os"
-	"path"
 )
 
 func disassembleStep(vm virtualMachine, code []gvm.Code) virtualMachine {
@@ -41,7 +40,7 @@ func disassembleStep(vm virtualMachine, code []gvm.Code) virtualMachine {
 	return vm
 }
 
-func disassemble(code []gvm.Code, ctxt gvm.Context) {
+func disassemble(code []gvm.Code) {
 	vm := virtualMachine{}
 	for vm.codePosition < int64(len(code)) {
 		vm = disassembleStep(vm, code)
@@ -61,6 +60,5 @@ func Disassemble(filePath string) {
 
 	code := compiler.ReadCode(file)
 
-	ctxt := gvm.Context{FileName: path.Base(filePath)}
-	disassemble(code, ctxt)
+	disassemble(code)
 }
