@@ -120,7 +120,7 @@ character `;` and everything that follows it will be ignored by the compiler.
 | jge | `l` | | Jumps to label `l` if in last comparison `r1` >= `r2`. |
 | jle | `l` | | Jumps to label `l` if in last comparison `r1` <= `r2`. |
 | show | `r` | | Displays the content of register `r` to standard output. |
-| call | `l` | | Jumps to the label `l` while saving current position to the callstack. |
-| ret | | | Jumps back to the last position in the callstack. |
+| call | `l` | | Jumps to the label `l` while pushing current position to the callstack. |
+| ret | | | Jumps back to the last position in the callstack popping the value. |
 | noop | | | Does nothing. |
 
