@@ -24,8 +24,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	var ctxt gvm.Context
-
 	// Check early if we're actually doing logging
 	hasLogging := false
 	if args[0] == "l" {
@@ -54,37 +52,37 @@ func main() {
 			appLogger.Criticalf("Expected two files after 'compile': <source_path>, <object_path>\n")
 			os.Exit(1)
 		}
-		compiler.Compile(args[1], args[2], ctxt)
+		compiler.Compile(args[1], args[2])
 
 	case "r", "run":
 		if len(args) != 2 {
 			appLogger.Criticalf("Expected one file after 'run': <object_path>\n")
 			os.Exit(1)
 		}
-		vm.Run(args[1], ctxt)
+		vm.Run(args[1])
 
 	case "d", "disassemble":
 		if len(args) != 2 {
 			appLogger.Criticalf("Expected one file after 'disassemble': <object_path>\n")
 			os.Exit(1)
 		}
-		vm.Disassemble(args[1], ctxt)
+		vm.Disassemble(args[1])
 
 	case "cr":
 		if len(args) != 3 {
 			appLogger.Criticalf("Expected two files after 'cr': <source_path>, <object_path>\n")
 			os.Exit(1)
 		}
-		compiler.Compile(args[1], args[2], ctxt)
-		vm.Run(args[2], ctxt)
+		compiler.Compile(args[1], args[2])
+		vm.Run(args[2])
 
 	case "cd":
 		if len(args) != 3 {
 			appLogger.Criticalf("Expected two files after 'cd': <source_path>, <object_path>\n")
 			os.Exit(1)
 		}
-		compiler.Compile(args[1], args[2], ctxt)
-		vm.Disassemble(args[2], ctxt)
+		compiler.Compile(args[1], args[2])
+		vm.Disassemble(args[2])
 
 	case "h", "help":
 		fmt.Println("gvm [logging flag] <command> [input file] [output file]")

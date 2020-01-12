@@ -15,7 +15,7 @@ sub     r1      r2
 show    r2
 
 ; Multiplication
-const   -10     r1
+cons   -10     r1
 const   -5      r2
 mul     r1      r2
 show    r2

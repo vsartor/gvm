@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func Run(filePath string, ctxt gvm.Context) {
+func Run(filePath string) {
 	gvm.Logger.Infof("Starting to disassemble.\n")
 
 	gvm.Logger.Infof("Opening file '%s'.\n", filePath)

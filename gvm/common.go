@@ -9,7 +9,8 @@ import (
 type Code int64
 
 type Context struct {
-	LineNum int
+	FileName string
+	LineNum  int
 }
 
 var Logger loggo.Logger

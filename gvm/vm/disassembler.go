@@ -6,6 +6,7 @@ import (
 	"github.com/vsartor/gvm/gvm/compiler"
 	"github.com/vsartor/gvm/gvm/lang"
 	"os"
+	"path"
 )
 
 func disassemble(code []gvm.Code, ctxt gvm.Context) {
@@ -36,7 +37,7 @@ func disassemble(code []gvm.Code, ctxt gvm.Context) {
 	}
 }
 
-func Disassemble(filePath string, ctxt gvm.Context) {
+func Disassemble(filePath string) {
 	gvm.Logger.Infof("Starting to disassemble.\n")
 
 	gvm.Logger.Infof("Opening file '%s'.\n", filePath)
@@ -49,5 +50,6 @@ func Disassemble(filePath string, ctxt gvm.Context) {
 
 	code := compiler.ReadCode(file)
 
+	ctxt := gvm.Context{FileName: path.Base(filePath)}
 	disassemble(code, ctxt)
 }

@@ -6,13 +6,14 @@ import (
 	"github.com/vsartor/gvm/gvm"
 	"github.com/vsartor/gvm/gvm/lang"
 	"os"
+	"path"
 	"strings"
 )
 
 func assertArgCount(instruction gvm.Code, expectedCount, argCount int, ctxt gvm.Context) {
 	if expectedCount != argCount {
-		gvm.Logger.Criticalf("l%d: Token `%s` expected %d arguments, got %d.\n",
-			ctxt.LineNum, lang.ToString(instruction), expectedCount, argCount)
+		gvm.Logger.Criticalf("%s.%d: Token `%s` expected %d arguments, got %d.\n",
+			ctxt.FileName, ctxt.LineNum, lang.ToString(instruction), expectedCount, argCount)
 		os.Exit(1)
 	}
 }
@@ -72,21 +73,25 @@ func compile(src *os.File, ctxt gvm.Context) []gvm.Code {
 			if labelName[0] == '.' {
 				//  If it's a sublabel, expand its name to include the labelName
 				if len(lastLabel) == 0 {
-					gvm.Logger.Criticalf("l%d: Orphan sublabel '%s' found.", ctxt.LineNum, labelName)
+					gvm.Logger.Criticalf("%s.%d: Orphan sublabel '%s' found.",
+						ctxt.FileName, ctxt.LineNum, labelName)
 					os.Exit(1)
 				}
 				labelName = expandSublabel(labelName, lastLabel)
 
-				gvm.Logger.Debugf("l%d: Read sublabel %s at %d.", ctxt.LineNum, labelName, currCodePosition)
+				gvm.Logger.Debugf("%s.%d: Read sublabel %s at %d.",
+					ctxt.FileName, ctxt.LineNum, labelName, currCodePosition)
 			} else {
 				// Remember the last labelName
-				gvm.Logger.Debugf("l%d: Read label %s at %d.", ctxt.LineNum, labelName, currCodePosition)
+				gvm.Logger.Debugf("%s.%d: Read label %s at %d.",
+					ctxt.FileName, ctxt.LineNum, labelName, currCodePosition)
 				lastLabel = labelName
 			}
 
 			// Do not allow multiple instances of the same labelName
 			if _, ok := labelToPosition[labelName]; ok {
-				gvm.Logger.Criticalf("l%d: Attempt to overwrite label '%s'.", ctxt.LineNum, labelName)
+				gvm.Logger.Criticalf("%s.%d: Attempt to overwrite label '%s'.",
+					ctxt.FileName, ctxt.LineNum, labelName)
 				os.Exit(1)
 			}
 
@@ -134,7 +139,8 @@ func compile(src *os.File, ctxt gvm.Context) []gvm.Code {
 			code = append(code, parseRegister(tokens[1], ctxt))
 			currCodePosition += 2
 		default:
-			gvm.Logger.Criticalf("l%d: Unknown instruction code %d.", ctxt.LineNum, instruction)
+			gvm.Logger.Criticalf("%s.%d: Unknown instruction code %d.",
+				ctxt.FileName, ctxt.LineNum, instruction)
 			os.Exit(1)
 		}
 	}
@@ -237,7 +243,7 @@ func ReadCode(file *os.File) []gvm.Code {
 	return code
 }
 
-func Compile(srcPath, dstPath string, ctxt gvm.Context) {
+func Compile(srcPath, dstPath string) {
 	// Open source file
 	gvm.Logger.Infof("Opening '%s'.\n", srcPath)
 	input, err := os.Open(srcPath)
@@ -248,6 +254,7 @@ func Compile(srcPath, dstPath string, ctxt gvm.Context) {
 	defer input.Close()
 
 	// Parse the file
+	ctxt := gvm.Context{FileName: path.Base(srcPath)}
 	code := compile(input, ctxt)
 
 	// Create object file
