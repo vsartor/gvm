@@ -29,6 +29,31 @@ func (ctxt *debugContext) isNotBreakpoint(codePosition int64) bool {
 	return !ctxt.isBreakpoint(codePosition)
 }
 
+func handlePrintInput(param string, vm *virtualMachine, code []gvm.Code) {
+	switch param {
+	case "stack":
+		fmt.Printf("%v\n", vm.stack[:vm.stackPtr])
+	case "reg":
+		fmt.Printf("%v\n", vm.reg)
+	case "code":
+		disassemble(code)
+	default:
+		gvm.Logger.Errorf("Unknown argument '%s'.\n", param)
+	}
+}
+
+func handleBreakPointInput(param string, vm *virtualMachine, code []gvm.Code, ctxt *debugContext) {
+	value, parseErr := strconv.ParseInt(param, 10, 64)
+	if parseErr != nil {
+		gvm.Logger.Errorf("Could not process integer '%s'.\n", value)
+		return
+	}
+
+	if ctxt.isNotBreakpoint(value) {
+		ctxt.breakPoints = append(ctxt.breakPoints, value)
+	}
+}
+
 func debugStep(vm *virtualMachine, code []gvm.Code, ctxt *debugContext) {
 	// Show current position
 	disassembleStep(*vm, code)
@@ -76,16 +101,7 @@ func debugStep(vm *virtualMachine, code []gvm.Code, ctxt *debugContext) {
 					gvm.Logger.Errorf("`bp` requires one argument.\n")
 					return
 				}
-
-				value, parseErr := strconv.ParseInt(tokens[1], 10, 64)
-				if parseErr != nil {
-					gvm.Logger.Errorf("Could not process integer '%s'.\n", value)
-					return
-				}
-
-				if ctxt.isNotBreakpoint(value) {
-					ctxt.breakPoints = append(ctxt.breakPoints, value)
-				}
+				handleBreakPointInput(tokens[1], vm, code, ctxt)
 				return
 
 			case "p":
@@ -93,17 +109,7 @@ func debugStep(vm *virtualMachine, code []gvm.Code, ctxt *debugContext) {
 					gvm.Logger.Errorf("`p` requires one argument.\n")
 					return
 				}
-
-				switch tokens[1] {
-				case "stack":
-					fmt.Printf("%v\n", vm.stack[:vm.stackPtr])
-				case "reg":
-					fmt.Printf("%v\n", vm.reg)
-				case "code":
-					disassemble(code)
-				default:
-					gvm.Logger.Errorf("Unknown argument '%s'.\n", command)
-				}
+				handlePrintInput(tokens[1], vm, code)
 				return
 
 			default:
