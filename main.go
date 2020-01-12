@@ -81,7 +81,7 @@ func main() {
 			appLogger.Criticalf("Expected one file after 'run': <object_path>\n")
 			os.Exit(1)
 		}
-		vm.Execute(args[1], args[2:])
+		vm.Debug(args[1], args[2:])
 
 	case "cr":
 		// For composite commands, if output directory is not given write to tmpdir
@@ -109,6 +109,19 @@ func main() {
 		compiler.Compile(args[1], args[2])
 		vm.Disassemble(args[2])
 
+	case "cD":
+		// For composite commands, if output directory is not given write to tmpdir
+		if len(args) == 2 {
+			args = append(args, path.Join(os.TempDir(), currentTimestamp()))
+		}
+
+		if len(args) < 3 {
+			appLogger.Criticalf("Expected two files after 'cD': <source_path>, <object_path>\n")
+			os.Exit(1)
+		}
+		compiler.Compile(args[1], args[2])
+		vm.Debug(args[2], args[3:])
+
 	case "h", "help":
 		fmt.Println("gvm [logging flag] <command> [input file] [output file]")
 		fmt.Println("Available commands:")
@@ -116,8 +129,10 @@ func main() {
 		fmt.Println("  compile (c)        Compiles a file.")
 		fmt.Println("  run (r)            Runs a compiled file.")
 		fmt.Println("  disassemble (d)    Disassembles and pretty prints a compiled file.")
+		fmt.Println("  debug (D)          Runs a compiled file in debug mode.")
 		fmt.Println("  cd                 Compiles, disassembles and pretty prints a compiled file.")
 		fmt.Println("  cr                 Compiles a file and then runs it.")
+		fmt.Println("  cD                 Compiles a file and then runs it in debug mode.")
 		fmt.Println("Available logging flags:")
 		fmt.Println("  l                  Basic logging.")
 		fmt.Println("  L                  Verbose logging.")
