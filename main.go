@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/juju/loggo"
 	"github.com/vsartor/gvm/gvm"
 	"github.com/vsartor/gvm/gvm/compiler"
 	"github.com/vsartor/gvm/gvm/vm"
@@ -28,11 +29,10 @@ func main() {
 	debugOffset := 0
 	if args[0] == "l" {
 		debugOffset++
-		gvm.Logger.SetOutput(os.Stderr)
+		gvm.Logger.SetLogLevel(loggo.INFO)
 	} else if args[0] == "L" {
 		debugOffset++
-		gvm.Logger.SetOutput(os.Stdout)
-		ctxt.IsVerbose = true
+		gvm.Logger.SetLogLevel(loggo.DEBUG)
 	}
 
 	// Error out in case only a debug flag was passed
@@ -43,44 +43,35 @@ func main() {
 	// Dispatch into the correct routine
 	switch runMode := args[0+debugOffset]; runMode {
 	case "c", "compile":
-		gvm.Logger.Println("Compilation mode has been set.")
 		if len(args) != 3+debugOffset {
 			appLogger.Fatalln("Expected two files after 'compile': <source_path>, <object_path>")
 		}
 		compiler.Compile(args[1+debugOffset], args[2+debugOffset], ctxt)
 
 	case "r", "run":
-		gvm.Logger.Println("Execution mode has been set.")
 		if len(args) != 2+debugOffset {
 			appLogger.Fatalln("Expected one file after 'run': <object_path>")
 		}
 		vm.Run(args[1+debugOffset], ctxt)
 
 	case "d", "disassemble":
-		gvm.Logger.Println("Disassembly mode has been set.")
 		if len(args) != 2+debugOffset {
 			appLogger.Fatalln("Expected one file after 'disassemble': <object_path>")
 		}
 		vm.Disassemble(args[1+debugOffset], ctxt)
 
 	case "cr":
-		gvm.Logger.Println("Compilation and running mode has been set.")
 		if len(args) != 3+debugOffset {
 			appLogger.Fatalln("Expected two files after 'cr': <source_path>, <object_path>")
 		}
-		gvm.Logger.Println("Starting compilation mode.")
 		compiler.Compile(args[1+debugOffset], args[2+debugOffset], ctxt)
-		gvm.Logger.Println("Starting running mode.")
 		vm.Run(args[2+debugOffset], ctxt)
 
 	case "cd":
-		gvm.Logger.Println("Compilation and disassembly mode has been set.")
 		if len(args) != 3+debugOffset {
 			appLogger.Fatalln("Expected two files after 'cd': <source_path>, <object_path>")
 		}
-		gvm.Logger.Println("Starting compilation mode.")
 		compiler.Compile(args[1+debugOffset], args[2+debugOffset], ctxt)
-		gvm.Logger.Println("Starting disassembly mode.")
 		vm.Disassemble(args[2+debugOffset], ctxt)
 
 	case "h", "help":

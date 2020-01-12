@@ -12,7 +12,7 @@ func disassemble(code []gvm.Code, ctxt gvm.Context) {
 	codePosition := 0
 	for codePosition < len(code) {
 		switch instruction := code[codePosition]; instruction {
-		case lang.Halt, lang.Ret:
+		case lang.Halt, lang.Ret, lang.Noop:
 			fmt.Printf("%04d: %s\n", codePosition, lang.ToString(instruction))
 			codePosition++
 		case lang.Const:
@@ -30,18 +30,20 @@ func disassemble(code []gvm.Code, ctxt gvm.Context) {
 			fmt.Printf("%04d: %s r%d\n", codePosition, lang.ToString(instruction), code[codePosition+1])
 			codePosition += 2
 		default:
-			gvm.Logger.Fatalf("Unexpected instruction code %d.\n", instruction)
+			gvm.Logger.Criticalf("Unexpected instruction code %d.\n", instruction)
+			os.Exit(1)
 		}
 	}
 }
 
 func Disassemble(filePath string, ctxt gvm.Context) {
-	gvm.Logger.Println("Starting to disassemble.")
+	gvm.Logger.Infof("Starting to disassemble.\n")
 
-	gvm.Logger.Printf("Opening file '%s'.\n", filePath)
+	gvm.Logger.Infof("Opening file '%s'.\n", filePath)
 	file, err := os.Open(filePath)
 	if err != nil {
-		gvm.Logger.Fatalf("Failed opening '%s': %s\n", filePath, err.Error())
+		gvm.Logger.Criticalf("Failed opening '%s': %s\n", filePath, err.Error())
+		os.Exit(1)
 	}
 	defer file.Close()
 

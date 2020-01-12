@@ -9,18 +9,19 @@ import (
 )
 
 func Run(filePath string, ctxt gvm.Context) {
-	gvm.Logger.Println("Starting to disassemble.")
+	gvm.Logger.Infof("Starting to disassemble.\n")
 
-	gvm.Logger.Printf("Opening file '%s'.\n", filePath)
+	gvm.Logger.Infof("Opening file '%s'.\n", filePath)
 	file, err := os.Open(filePath)
 	if err != nil {
-		gvm.Logger.Fatalf("Failed opening '%s': %s\n", filePath, err.Error())
+		gvm.Logger.Criticalf("Failed opening '%s': %s\n", filePath, err.Error())
+		os.Exit(1)
 	}
 	defer file.Close()
 
 	code := compiler.ReadCode(file)
 
-	gvm.Logger.Println("Starting execution.")
+	gvm.Logger.Infof("Starting execution.\n")
 
 	stack := make([]int64, gvm.StackSize)
 	stackPtr := 0
@@ -138,16 +139,24 @@ func Run(filePath string, ctxt gvm.Context) {
 			codePosition += 2
 		case lang.Call:
 			if callStackPtr == len(callStack) {
-				gvm.Logger.Fatalf("Call stack overflow.")
+				gvm.Logger.Criticalf("Call stack overflow.")
+				os.Exit(1)
 			}
 			callStack[callStackPtr] = codePosition + 2
 			codePosition = int64(code[codePosition+1])
 			callStackPtr++
 		case lang.Ret:
+			if callStackPtr == 0 {
+				gvm.Logger.Criticalf("Call stack underflow.")
+				os.Exit(1)
+			}
 			callStackPtr--
 			codePosition = callStack[callStackPtr]
+		case lang.Noop:
+			codePosition++
 		default:
-			gvm.Logger.Fatalf("Unexpected instruction code %d.\n", code[codePosition])
+			gvm.Logger.Criticalf("Unexpected instruction code %d.\n", code[codePosition])
+			os.Exit(1)
 		}
 	}
 }

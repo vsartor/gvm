@@ -11,8 +11,9 @@ import (
 
 func assertArgCount(instruction gvm.Code, expectedCount, argCount int, ctxt gvm.Context) {
 	if expectedCount != argCount {
-		gvm.Logger.Fatalf("l%d: Token `%s` expected %d arguments, got %d.\n",
+		gvm.Logger.Criticalf("l%d: Token `%s` expected %d arguments, got %d.\n",
 			ctxt.LineNum, lang.ToString(instruction), expectedCount, argCount)
+		os.Exit(1)
 	}
 }
 
@@ -21,7 +22,7 @@ func expandSublabel(sublabel, lastLabel string) string {
 }
 
 func compile(src *os.File, ctxt gvm.Context) []gvm.Code {
-	gvm.Logger.Printf("Parsing file '%s'.\n", src.Name())
+	gvm.Logger.Infof("Parsing file '%s'.\n", src.Name())
 
 	code := make([]gvm.Code, 0, gvm.CodeArrayInitialSize)
 
@@ -38,7 +39,7 @@ func compile(src *os.File, ctxt gvm.Context) []gvm.Code {
 	currCodePosition := int64(2)
 	ctxt.LineNum = 0
 
-	gvm.Logger.Println("Parser pass.")
+	gvm.Logger.Infof("Parser pass starting.\n")
 
 	scanner := bufio.NewScanner(src)
 	for scanner.Scan() {
@@ -71,26 +72,22 @@ func compile(src *os.File, ctxt gvm.Context) []gvm.Code {
 			if labelName[0] == '.' {
 				//  If it's a sublabel, expand its name to include the labelName
 				if len(lastLabel) == 0 {
-					gvm.Logger.Fatalf("l%d: Orphan sublabel '%s' found.", ctxt.LineNum, labelName)
+					gvm.Logger.Criticalf("l%d: Orphan sublabel '%s' found.", ctxt.LineNum, labelName)
+					os.Exit(1)
 				}
 				labelName = expandSublabel(labelName, lastLabel)
 
-				if ctxt.IsVerbose {
-					gvm.Logger.Printf("l%d: Read sublabel %s at %d.",
-						ctxt.LineNum, labelName, currCodePosition)
-				}
+				gvm.Logger.Debugf("l%d: Read sublabel %s at %d.", ctxt.LineNum, labelName, currCodePosition)
 			} else {
 				// Remember the last labelName
-				if ctxt.IsVerbose {
-					gvm.Logger.Printf("l%d: Read label %s at %d.",
-						ctxt.LineNum, labelName, currCodePosition)
-				}
+				gvm.Logger.Debugf("l%d: Read label %s at %d.", ctxt.LineNum, labelName, currCodePosition)
 				lastLabel = labelName
 			}
 
 			// Do not allow multiple instances of the same labelName
 			if _, ok := labelToPosition[labelName]; ok {
-				gvm.Logger.Fatalf("l%d: Attempt to overwrite label '%s'.", ctxt.LineNum, labelName)
+				gvm.Logger.Criticalf("l%d: Attempt to overwrite label '%s'.", ctxt.LineNum, labelName)
+				os.Exit(1)
 			}
 
 			labelToPosition[labelName] = currCodePosition
@@ -137,15 +134,17 @@ func compile(src *os.File, ctxt gvm.Context) []gvm.Code {
 			code = append(code, parseRegister(tokens[1], ctxt))
 			currCodePosition += 2
 		default:
-			gvm.Logger.Fatalf("l%d: Unknown instructionType '%v'.", ctxt.LineNum, instruction)
+			gvm.Logger.Criticalf("l%d: Unknown instruction code %d.", ctxt.LineNum, instruction)
+			os.Exit(1)
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		gvm.Logger.Fatalf("Error while reading the file: %s.\n", err.Error())
+		gvm.Logger.Criticalf("Error while reading the file: %s.\n", err.Error())
+		os.Exit(1)
 	}
 
-	gvm.Logger.Println("Label pass.")
+	gvm.Logger.Infof("Label pass starting.\n")
 
 	// Check if `main` was defined. If it has, change the `noop`s into the correct
 	// instruction.
@@ -153,67 +152,74 @@ func compile(src *os.File, ctxt gvm.Context) []gvm.Code {
 		code[0] = lang.Jmp
 		code[1] = gvm.Code(mainPosition)
 	} else {
-		gvm.Logger.Println("The label `main` was not defined.")
+		gvm.Logger.Infof("The label `main` was not defined.\n")
 	}
 
 	// Fill in code positions based on the labels
 	for srcPosition, label := range positionToLabel {
 		dstPosition, ok := labelToPosition[label]
 		if !ok {
-			gvm.Logger.Fatalf("At srcPosition %d reference to unknown label '%s'.", srcPosition, label)
+			gvm.Logger.Criticalf("At position %d reference to unknown label '%s'.", srcPosition, label)
+			os.Exit(1)
 		}
 		code[srcPosition] = gvm.Code(dstPosition)
 	}
 
-	gvm.Logger.Println("Finished parsing.")
+	gvm.Logger.Infof("Finished parsing.\n")
 
 	return code
 }
 
 func writeCode(code []gvm.Code, output *os.File) {
-	gvm.Logger.Println("Writing binary file.")
+	gvm.Logger.Infof("Writing binary file.\n")
 
 	// Header
 	err := binary.Write(output, binary.LittleEndian, gvm.BinaryFileHeader)
 	if err != nil {
-		gvm.Logger.Fatalf("Failed writting header: %s\n", err.Error())
+		gvm.Logger.Criticalf("Failed writting header: %s\n", err.Error())
+		os.Exit(1)
 	}
 
 	// Size of the code
 	err = binary.Write(output, binary.LittleEndian, int64(len(code)))
 	if err != nil {
-		gvm.Logger.Fatalf("Failed writting size of code array: %s\n", err.Error())
+		gvm.Logger.Criticalf("Failed writting size of code array: %s\n", err.Error())
+		os.Exit(1)
 	}
 
 	// Write the code
 	for _, tok := range code {
 		err = binary.Write(output, binary.LittleEndian, tok)
 		if err != nil {
-			gvm.Logger.Fatalf("Failed writting code token: %s\n", err.Error())
+			gvm.Logger.Criticalf("Failed writting code token: %s\n", err.Error())
+			os.Exit(1)
 		}
 	}
 
-	gvm.Logger.Println("Finished writting binary file.")
+	gvm.Logger.Infof("Finished writting binary file.\n")
 }
 
 func ReadCode(file *os.File) []gvm.Code {
-	gvm.Logger.Println("Reading binary file.")
+	gvm.Logger.Infof("Reading binary file.\n")
 
 	// Read and validate header
 	var header int64
 	err := binary.Read(file, binary.LittleEndian, &header)
 	if err != nil {
-		gvm.Logger.Fatalf("Failed reading header: %s\n", err.Error())
+		gvm.Logger.Criticalf("Failed reading header: %s\n", err.Error())
+		os.Exit(1)
 	}
 	if header != gvm.BinaryFileHeader {
-		gvm.Logger.Fatalf("Expected header %d but got %d.\n", gvm.BinaryFileHeader, header)
+		gvm.Logger.Criticalf("Expected header %d but got %d.\n", gvm.BinaryFileHeader, header)
+		os.Exit(1)
 	}
 
 	// Read code size and allocate slice
 	var codeSize int64
 	err = binary.Read(file, binary.LittleEndian, &codeSize)
 	if err != nil {
-		gvm.Logger.Fatalf("Failed reading code size: %s\n", err.Error())
+		gvm.Logger.Criticalf("Failed reading code size: %s\n", err.Error())
+		os.Exit(1)
 	}
 	code := make([]gvm.Code, codeSize)
 
@@ -221,21 +227,23 @@ func ReadCode(file *os.File) []gvm.Code {
 	for i := 0; i < int(codeSize); i++ {
 		err = binary.Read(file, binary.LittleEndian, &code[i])
 		if err != nil {
-			gvm.Logger.Fatalf("Failed reading code token: %s\n", err.Error())
+			gvm.Logger.Criticalf("Failed reading code token: %s\n", err.Error())
+			os.Exit(1)
 		}
 	}
 
-	gvm.Logger.Println("Finished reading binary file.")
+	gvm.Logger.Infof("Finished reading binary file.\n")
 
 	return code
 }
 
 func Compile(srcPath, dstPath string, ctxt gvm.Context) {
 	// Open source file
-	gvm.Logger.Printf("Opening '%s'.\n", srcPath)
+	gvm.Logger.Infof("Opening '%s'.\n", srcPath)
 	input, err := os.Open(srcPath)
 	if err != nil {
-		gvm.Logger.Fatalf("Failed opening '%s': %s\n", srcPath, err.Error())
+		gvm.Logger.Criticalf("Failed opening '%s': %s\n", srcPath, err.Error())
+		os.Exit(1)
 	}
 	defer input.Close()
 
@@ -243,10 +251,11 @@ func Compile(srcPath, dstPath string, ctxt gvm.Context) {
 	code := compile(input, ctxt)
 
 	// Create object file
-	gvm.Logger.Printf("Opening '%s'.\n", dstPath)
+	gvm.Logger.Infof("Opening '%s'.\n", dstPath)
 	output, err := os.Create(dstPath)
 	if err != nil {
-		gvm.Logger.Fatalf("Failed opening '%s': %s\n", dstPath, err.Error())
+		gvm.Logger.Criticalf("Failed opening '%s': %s\n", dstPath, err.Error())
+		os.Exit(1)
 	}
 	defer output.Close()
 
