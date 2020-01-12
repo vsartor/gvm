@@ -6,21 +6,22 @@ import (
 	"github.com/vsartor/gvm/gvm"
 	"github.com/vsartor/gvm/gvm/compiler"
 	"github.com/vsartor/gvm/gvm/vm"
-	"log"
 	"os"
 )
 
-var appLogger *log.Logger
+var appLogger loggo.Logger
 
 func init() {
-	appLogger = log.New(os.Stderr, "gvm: ", 0)
+	appLogger = loggo.GetLogger("gvm")
+	appLogger.SetLogLevel(loggo.INFO)
 }
 
 func main() {
 	args := os.Args[1:]
 
 	if len(args) == 0 {
-		appLogger.Fatalln("Expected at least one argument. Call 'gvm help' for usage.")
+		appLogger.Criticalf("Expected at least one argument. Call 'gvm help' for usage.\n")
+		os.Exit(1)
 	}
 
 	var ctxt gvm.Context
@@ -37,7 +38,8 @@ func main() {
 
 	// Error out in case only a debug flag was passed
 	if hasLogging && len(args) == 1 {
-		appLogger.Fatalln("Only received a debug flag.")
+		appLogger.Criticalf("Only received a debug flag.\n")
+		os.Exit(1)
 	}
 
 	// Remove logging argument from args
@@ -49,32 +51,37 @@ func main() {
 	switch runMode := args[0]; runMode {
 	case "c", "compile":
 		if len(args) != 3 {
-			appLogger.Fatalln("Expected two files after 'compile': <source_path>, <object_path>")
+			appLogger.Criticalf("Expected two files after 'compile': <source_path>, <object_path>\n")
+			os.Exit(1)
 		}
 		compiler.Compile(args[1], args[2], ctxt)
 
 	case "r", "run":
 		if len(args) != 2 {
-			appLogger.Fatalln("Expected one file after 'run': <object_path>")
+			appLogger.Criticalf("Expected one file after 'run': <object_path>\n")
+			os.Exit(1)
 		}
 		vm.Run(args[1], ctxt)
 
 	case "d", "disassemble":
 		if len(args) != 2 {
-			appLogger.Fatalln("Expected one file after 'disassemble': <object_path>")
+			appLogger.Criticalf("Expected one file after 'disassemble': <object_path>\n")
+			os.Exit(1)
 		}
 		vm.Disassemble(args[1], ctxt)
 
 	case "cr":
 		if len(args) != 3 {
-			appLogger.Fatalln("Expected two files after 'cr': <source_path>, <object_path>")
+			appLogger.Criticalf("Expected two files after 'cr': <source_path>, <object_path>\n")
+			os.Exit(1)
 		}
 		compiler.Compile(args[1], args[2], ctxt)
 		vm.Run(args[2], ctxt)
 
 	case "cd":
 		if len(args) != 3 {
-			appLogger.Fatalln("Expected two files after 'cd': <source_path>, <object_path>")
+			appLogger.Criticalf("Expected two files after 'cd': <source_path>, <object_path>\n")
+			os.Exit(1)
 		}
 		compiler.Compile(args[1], args[2], ctxt)
 		vm.Disassemble(args[2], ctxt)
@@ -93,6 +100,7 @@ func main() {
 		fmt.Println("  L                  Verbose logging.")
 
 	default:
-		appLogger.Fatalf("Unknown command '%s'.\n", runMode)
+		appLogger.Criticalf("Unknown command '%s'.\n", runMode)
+		os.Exit(1)
 	}
 }
