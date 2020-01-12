@@ -7,6 +7,8 @@ import (
 	"github.com/vsartor/gvm/gvm/compiler"
 	"github.com/vsartor/gvm/gvm/vm"
 	"os"
+	"path"
+	"time"
 )
 
 var appLogger loggo.Logger
@@ -69,6 +71,11 @@ func main() {
 		vm.Disassemble(args[1])
 
 	case "cr":
+		// For composite commands, if output directory is not given write to tmpdir
+		if len(args) == 2 {
+			args = append(args, path.Join(os.TempDir(), time.Now().String()))
+		}
+
 		if len(args) != 3 {
 			appLogger.Criticalf("Expected two files after 'cr': <source_path>, <object_path>\n")
 			os.Exit(1)
@@ -77,6 +84,11 @@ func main() {
 		vm.Run(args[2])
 
 	case "cd":
+		// For composite commands, if output directory is not given write to tmpdir
+		if len(args) == 2 {
+			args = append(args, path.Join(os.TempDir(), time.Now().String()))
+		}
+
 		if len(args) != 3 {
 			appLogger.Criticalf("Expected two files after 'cd': <source_path>, <object_path>\n")
 			os.Exit(1)
