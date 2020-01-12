@@ -99,28 +99,28 @@ character `;` and everything that follows it will be ignored by the compiler.
 
 | Instruction | Param | Param | Description |
 |-------------|-------|-------|-------------|
-| halt | | | Stops program execution. |
-| const | `c` | `r` | Writes the constant `c` to register `r`. |
-| push | `r` | | Pushes the value from register `r` onto the stack. |
-| pop | `r` | | Pops the value at the top of the stack into register `r`. |
-| inc | `r` | | Increases the value of register `r` by 1. |
-| dec | `r` | | Decreases the value of register `r` by 1. |
-| mov | `r1` | `r2` | Copies the value of register `r1` to register `r2`. |
-| add | `r1` | `r2` | Adds the value of register `r1` to register `r2`. |
-| sub | `r1` | `r2` | Subtracts the value of register `r1` from the value of register `r2`. |
-| mul | `r1` | `r2` | Multiplies the value of register `r1` to the value of register `r2` |
-| div | `r1` | `r2` | Divides the value of register `r2` by the value of register `r1`, saving the result in register `r2`. |
-| rem | `r1` | `r2` | Stores the remainder of the division of the value of register `r2` by the value of register `r1` in register `r2`. |
-| cmp | `r1` | `r2` | Stores a comparison between registers `r1` and `r2`. |
-| jmp | `l` | | Jumps to label `l`. |
-| jeq | `l` | | Jumps to label `l` if in last comparison `r1` = `r2`. |
-| jne | `l` | | Jumps to label `l` if in last comparison `r1` != `r2`. |
-| jgt | `l` | | Jumps to label `l` if in last comparison `r1` > `r2`. |
-| jlt | `l` | | Jumps to label `l` if in last comparison `r1` < `r2`. |
-| jge | `l` | | Jumps to label `l` if in last comparison `r1` >= `r2`. |
-| jle | `l` | | Jumps to label `l` if in last comparison `r1` <= `r2`. |
-| show | `r` | | Displays the content of register `r` to standard output. |
-| call | `l` | | Jumps to the label `l` while pushing current position to the callstack. |
-| ret | | | Jumps back to the last position in the callstack popping the value. |
-| noop | | | Does nothing. |
+| `halt` | | | Stops program execution. |
+| `const` | `c` | `r` | Writes the constant `c` to register `r`. |
+| `push` | `r` | | Pushes the value from register `r` onto the stack. |
+| `pop` | `r` | | Pops the value at the top of the stack into register `r`. |
+| `inc` | `r` | | Increases the value of register `r` by 1. |
+| `dec` | `r` | | Decreases the value of register `r` by 1. |
+| `mov` | `r1` | `r2` | Copies the value of register `r1` to register `r2`. |
+| `add` | `r1` | `r2` | Adds the value of register `r1` to register `r2`. |
+| `sub` | `r1` | `r2` | Subtracts the value of register `r1` from the value of register `r2`. |
+| `mul` | `r1` | `r2` | Multiplies the value of register `r1` to the value of register `r2` |
+| `div` | `r1` | `r2` | Divides the value of register `r2` by the value of register `r1`, saving the result in register `r2`. |
+| `rem` | `r1` | `r2` | Stores the remainder of the division of the value of register `r2` by the value of register `r1` in register `r2`. |
+| `cmp` | `r1` | `r2` | Stores a comparison between registers `r1` and `r2`. |
+| `jmp` | `l` | | Jumps to label `l`. |
+| `jeq` | `l` | | Jumps to label `l` if in last comparison `r1` = `r2`. |
+| `jne` | `l` | | Jumps to label `l` if in last comparison `r1` != `r2`. |
+| `jgt` | `l` | | Jumps to label `l` if in last comparison `r1` > `r2`. |
+| `jlt` | `l` | | Jumps to label `l` if in last comparison `r1` < `r2`. |
+| `jge` | `l` | | Jumps to label `l` if in last comparison `r1` >= `r2`. |
+| `jle` | `l` | | Jumps to label `l` if in last comparison `r1` <= `r2`. |
+| `show` | `r` | | Displays the content of register `r` to standard output. |
+| `call` | `l` | | Jumps to the label `l` while pushing current position to the callstack. |
+| `ret` | | | Jumps back to the last position in the callstack popping the value. |
+| `noop` | | | Does nothing. |
 
