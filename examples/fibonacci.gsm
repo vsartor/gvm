@@ -32,8 +32,8 @@ main:
         ; Get value from
         const   0       r1
         iarg    r1
-        pop     r1
         jerr    .bad_input
+        pop     r1
 .start:
         ; Call and print fibonacci(r1)
         call    fibonacci

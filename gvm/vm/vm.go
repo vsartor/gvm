@@ -37,6 +37,10 @@ func executeStep(instruction gvm.Code, code []gvm.Code, vm *virtualMachine) {
 		vm.stackPtr++
 		vm.codePosition += 2
 	case lang.Pop:
+		if vm.stackPtr == 0 {
+			gvm.Logger.Criticalf("Stack underflow.\n")
+			os.Exit(1)
+		}
 		vm.stackPtr--
 		dstRegIdx := code[vm.codePosition+1]
 		vm.reg[dstRegIdx] = vm.stack[vm.stackPtr]
@@ -136,7 +140,7 @@ func executeStep(instruction gvm.Code, code []gvm.Code, vm *virtualMachine) {
 		vm.codePosition += 2
 	case lang.Call:
 		if vm.callStackPtr == int64(len(vm.callStack)) {
-			gvm.Logger.Criticalf("Call stack overflow.")
+			gvm.Logger.Criticalf("Call stack overflow.\n")
 			os.Exit(1)
 		}
 		vm.callStack[vm.callStackPtr] = vm.codePosition + 2
@@ -144,7 +148,7 @@ func executeStep(instruction gvm.Code, code []gvm.Code, vm *virtualMachine) {
 		vm.callStackPtr++
 	case lang.Ret:
 		if vm.callStackPtr == 0 {
-			gvm.Logger.Criticalf("Call stack underflow.")
+			gvm.Logger.Criticalf("Call stack underflow.\n")
 			os.Exit(1)
 		}
 		vm.callStackPtr--
@@ -154,12 +158,17 @@ func executeStep(instruction gvm.Code, code []gvm.Code, vm *virtualMachine) {
 	case lang.Iarg:
 		srcRegIdx := code[vm.codePosition+1]
 		argIdx := vm.reg[srcRegIdx]
-		value, err := strconv.ParseInt(vm.args[argIdx], 10, 64)
-		if err != nil {
+		if argIdx < 0 || argIdx >= int64(len(vm.args)) {
 			vm.errFlag = 1
+		} else {
+			value, err := strconv.ParseInt(vm.args[argIdx], 10, 64)
+			if err != nil {
+				vm.errFlag = 1
+			} else {
+				vm.stack[vm.stackPtr] = value
+				vm.stackPtr++
+			}
 		}
-		vm.stack[vm.stackPtr] = value
-		vm.stackPtr++
 		vm.codePosition += 2
 	default:
 		gvm.Logger.Criticalf("Unexpected instruction code %d.\n", code[vm.codePosition])
