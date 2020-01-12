@@ -8,6 +8,7 @@ import (
 	"github.com/vsartor/gvm/gvm/vm"
 	"os"
 	"path"
+	"strconv"
 	"time"
 )
 
@@ -16,6 +17,11 @@ var appLogger loggo.Logger
 func init() {
 	appLogger = loggo.GetLogger("gvm")
 	appLogger.SetLogLevel(loggo.INFO)
+}
+
+func currentTimestamp() string {
+	nanoseconds := time.Now().UnixNano()
+	return strconv.FormatInt(nanoseconds, 10)
 }
 
 func main() {
@@ -73,7 +79,7 @@ func main() {
 	case "cr":
 		// For composite commands, if output directory is not given write to tmpdir
 		if len(args) == 2 {
-			args = append(args, path.Join(os.TempDir(), time.Now().String()))
+			args = append(args, path.Join(os.TempDir(), currentTimestamp()))
 		}
 
 		if len(args) != 3 {
@@ -86,7 +92,7 @@ func main() {
 	case "cd":
 		// For composite commands, if output directory is not given write to tmpdir
 		if len(args) == 2 {
-			args = append(args, path.Join(os.TempDir(), time.Now().String()))
+			args = append(args, path.Join(os.TempDir(), currentTimestamp()))
 		}
 
 		if len(args) != 3 {
