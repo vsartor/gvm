@@ -24,10 +24,10 @@ func disassemble(code []gvm.Code, ctxt gvm.Context) {
 			fmt.Printf("%04d: %s r%d r%d\n",
 				codePosition, lang.ToString(instruction), code[codePosition+1], code[codePosition+2])
 			codePosition += 3
-		case lang.Jmp, lang.Jeq, lang.Jne, lang.Jgt, lang.Jlt, lang.Jge, lang.Jle, lang.Call:
+		case lang.Jmp, lang.Jeq, lang.Jne, lang.Jgt, lang.Jlt, lang.Jge, lang.Jle, lang.Jerr, lang.Call:
 			fmt.Printf("%04d: %s %d\n", codePosition, lang.ToString(instruction), code[codePosition+1])
 			codePosition += 2
-		case lang.Show, lang.Inc, lang.Dec, lang.Push, lang.Pop:
+		case lang.Show, lang.Inc, lang.Dec, lang.Push, lang.Pop, lang.Iarg:
 			fmt.Printf("%04d: %s r%d\n", codePosition, lang.ToString(instruction), code[codePosition+1])
 			codePosition += 2
 		default:

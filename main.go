@@ -63,11 +63,11 @@ func main() {
 		compiler.Compile(args[1], args[2])
 
 	case "r", "run":
-		if len(args) != 2 {
+		if len(args) < 2 {
 			appLogger.Criticalf("Expected one file after 'run': <object_path>\n")
 			os.Exit(1)
 		}
-		vm.Run(args[1])
+		vm.Run(args[1], args[2:])
 
 	case "d", "disassemble":
 		if len(args) != 2 {
@@ -82,12 +82,12 @@ func main() {
 			args = append(args, path.Join(os.TempDir(), currentTimestamp()))
 		}
 
-		if len(args) != 3 {
+		if len(args) < 3 {
 			appLogger.Criticalf("Expected two files after 'cr': <source_path>, <object_path>\n")
 			os.Exit(1)
 		}
 		compiler.Compile(args[1], args[2])
-		vm.Run(args[2])
+		vm.Run(args[2], args[3:])
 
 	case "cd":
 		// For composite commands, if output directory is not given write to tmpdir

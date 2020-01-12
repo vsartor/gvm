@@ -6,9 +6,10 @@ import (
 	"github.com/vsartor/gvm/gvm/compiler"
 	"github.com/vsartor/gvm/gvm/lang"
 	"os"
+	"strconv"
 )
 
-func Run(filePath string) {
+func Run(filePath string, args []string) {
 	gvm.Logger.Infof("Starting to disassemble.\n")
 
 	gvm.Logger.Infof("Opening file '%s'.\n", filePath)
@@ -29,6 +30,7 @@ func Run(filePath string) {
 	callStackPtr := 0
 	reg := make([]int64, gvm.RegisterCount)
 	var cmpFlag int64
+	var errFlag int64
 
 	codePosition := int64(0)
 	for codePosition < int64(len(code)) {
@@ -133,6 +135,13 @@ func Run(filePath string) {
 			} else {
 				codePosition += 2
 			}
+		case lang.Jerr:
+			if errFlag != 0 {
+				errFlag = 0
+				codePosition = int64(code[codePosition+1])
+			} else {
+				codePosition += 2
+			}
 		case lang.Show:
 			srcRegIdx := code[codePosition+1]
 			fmt.Printf("%d\n", reg[srcRegIdx])
@@ -154,6 +163,17 @@ func Run(filePath string) {
 			codePosition = callStack[callStackPtr]
 		case lang.Noop:
 			codePosition++
+		case lang.Iarg:
+			srcRegIdx := code[codePosition+1]
+			argIdx := reg[srcRegIdx]
+			var value int64
+			value, err = strconv.ParseInt(args[argIdx], 10, 64)
+			if err != nil {
+				errFlag = 1
+			}
+			stack[stackPtr] = value
+			stackPtr++
+			codePosition += 2
 		default:
 			gvm.Logger.Criticalf("Unexpected instruction code %d.\n", code[codePosition])
 			os.Exit(1)

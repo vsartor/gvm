@@ -119,8 +119,9 @@ character `;` and everything that follows it will be ignored by the compiler.
 | `jlt` | `l` | | Jumps to label `l` if in last comparison `r1` < `r2`. |
 | `jge` | `l` | | Jumps to label `l` if in last comparison `r1` >= `r2`. |
 | `jle` | `l` | | Jumps to label `l` if in last comparison `r1` <= `r2`. |
+| `jerr` | `l` | | Jumps to label `l` if the error flag is set. Empties the error flag. |
 | `show` | `r` | | Displays the content of register `r` to standard output. |
 | `call` | `l` | | Jumps to the label `l` while pushing current position to the callstack. |
 | `ret` | | | Jumps back to the last position in the callstack popping the value. |
 | `noop` | | | Does nothing. |
-
+| `iarg` | `r` | | Attempts to interpret the `i`-th argument as an integer and push to the stack, where `i` is the value of register `r`. In case of an error, the error flag is set. |

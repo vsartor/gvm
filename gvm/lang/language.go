@@ -28,10 +28,12 @@ const (
 	Jlt
 	Jge
 	Jle
+	Jerr
 	Show
 	Call
 	Ret
 	Noop
+	Iarg
 )
 
 // Mappings between instructions and their string representations
@@ -65,10 +67,12 @@ func init() {
 	reprFromIns[Jlt] = "jlt"
 	reprFromIns[Jge] = "jge"
 	reprFromIns[Jle] = "jle"
+	reprFromIns[Jerr] = "jerr"
 	reprFromIns[Show] = "show"
 	reprFromIns[Call] = "call"
 	reprFromIns[Ret] = "ret"
 	reprFromIns[Noop] = "noop"
+	reprFromIns[Iarg] = "iarg"
 
 	for instruction, repr := range reprFromIns {
 		instructionFromRepr[repr] = instruction

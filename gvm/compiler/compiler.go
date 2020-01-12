@@ -117,7 +117,7 @@ func compile(src *os.File, ctxt gvm.Context) []gvm.Code {
 			code = append(code, parseRegister(tokens[1], ctxt))
 			code = append(code, parseRegister(tokens[2], ctxt))
 			currCodePosition += 3
-		case lang.Jmp, lang.Jeq, lang.Jne, lang.Jgt, lang.Jlt, lang.Jge, lang.Jle, lang.Call:
+		case lang.Jmp, lang.Jeq, lang.Jne, lang.Jgt, lang.Jlt, lang.Jge, lang.Jle, lang.Jerr, lang.Call:
 			assertArgCount(instruction, 2, len(tokens), ctxt)
 			code = append(code, instruction)
 			// Add a placeholder for the code srcPosition
@@ -133,7 +133,7 @@ func compile(src *os.File, ctxt gvm.Context) []gvm.Code {
 				positionToLabel[currCodePosition+1] = labelName
 			}
 			currCodePosition += 2
-		case lang.Show, lang.Inc, lang.Dec, lang.Push, lang.Pop:
+		case lang.Show, lang.Inc, lang.Dec, lang.Push, lang.Pop, lang.Iarg:
 			assertArgCount(instruction, 2, len(tokens), ctxt)
 			code = append(code, instruction)
 			code = append(code, parseRegister(tokens[1], ctxt))
