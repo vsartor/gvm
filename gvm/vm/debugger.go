@@ -34,9 +34,8 @@ func Debug(filePath string, args []string) {
 	}
 
 	for vm.codePosition < int64(len(code)) {
-		codePosition := vm.codePosition
-		instruction := code[codePosition]
+		instruction := code[vm.codePosition]
+		disassembleStep(instruction, code, vm.codePosition)
 		executeStep(instruction, code, &vm)
-		disassembleStep(instruction, code, codePosition)
 	}
 }
