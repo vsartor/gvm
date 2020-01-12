@@ -6,6 +6,10 @@ import (
 	"os"
 )
 
+func debugStep(instruction gvm.Code, code []gvm.Code, vm *virtualMachine) {
+
+}
+
 func Debug(filePath string, args []string) {
 	gvm.Logger.Infof("Starting to disassemble.\n")
 
@@ -34,8 +38,7 @@ func Debug(filePath string, args []string) {
 	}
 
 	for vm.codePosition < int64(len(code)) {
-		instruction := code[vm.codePosition]
-		disassembleStep(instruction, code, vm.codePosition)
-		executeStep(instruction, code, &vm)
+		disassembleStep(vm, code)
+		executeStep(&vm, code)
 	}
 }

@@ -21,8 +21,8 @@ type virtualMachine struct {
 	args         []string
 }
 
-func executeStep(instruction gvm.Code, code []gvm.Code, vm *virtualMachine) {
-	switch instruction {
+func executeStep(vm *virtualMachine, code []gvm.Code) {
+	switch instruction := code[vm.codePosition]; instruction {
 	case lang.Halt:
 		// Program needs to stop. Do so by making the loop condition false.
 		vm.codePosition = int64(len(code))
@@ -204,7 +204,6 @@ func Execute(filePath string, args []string) {
 	}
 
 	for vm.codePosition < int64(len(code)) {
-		instruction := code[vm.codePosition]
-		executeStep(instruction, code, &vm)
+		executeStep(&vm, code)
 	}
 }
